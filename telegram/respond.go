@@ -29,8 +29,10 @@ var (
 func Respond(u Update) (*Response, error) {
 	switch u.Message.Text {
 	case "/start":
-		return responseStart(u)
+		return start(u)
+	case "/rangkuman", "/rangkuman@" + Username:
+		return summary(u)
 	default:
-		return responseConfusing(u)
+		return confusing(u)
 	}
 }

@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-func TestRespondStart(t *testing.T) {
+func TestStart(t *testing.T) {
 	u := Update{}
 	u.Message.Text = "/start"
 	response, err := Respond(u)
 	notErrOrNil(t, response, err)
-	if response.Text != StartMsg {
+	if response.Text != startMsg {
 		t.Error("response text not match")
 	}
 	if response.ReplyToMessageId != 0 {
@@ -17,17 +17,31 @@ func TestRespondStart(t *testing.T) {
 	}
 }
 
-func TestRespondConfusing(t *testing.T) {
+func TestConfusing(t *testing.T) {
 	u := Update{}
 	u.Message.Text = "halo bot"
 	u.Message.MessageID = 1
 	response, err := Respond(u)
 	notErrOrNil(t, response, err)
-	if !contains(ConfusingMsgs, response.Text) {
+	if !contains(confusingMsgs, response.Text) {
 		t.Error("response text not match")
 	}
 	if response.ReplyToMessageId == 0 {
 		t.Error("response should reply")
+	}
+}
+
+func TestSummary(t *testing.T) {
+	u := Update{}
+	u.Message.Text = "/rangkuman"
+	u.Message.MessageID = 1
+	response, err := Respond(u)
+	notErrOrNil(t, response, err)
+	if response.Text != summaryMsg {
+		t.Error("response text not match")
+	}
+	if response.ReplyToMessageId != 0 {
+		t.Error("response should not reply")
 	}
 }
 

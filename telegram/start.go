@@ -1,7 +1,7 @@
 package telegram
 
 var (
-	StartMsg = `*Cara Catatan Belanja Bot Membantu Anda*
+	startMsg = `*Cara Catatan Belanja Bot Membantu Anda*
 - Undang @CatatanBelanjaBot ke grup Telegram keluarga anda
 - Bot mencatat pengeluaran Anda, ketika ada pesan seperti
   - @CatatanBelanjaBot bahan masakan 45.000
@@ -19,9 +19,9 @@ var (
   - /Hapus: menghapus catatan. _reply_ ke catatan yang ingin dihapus`
 )
 
-func responseStart(u Update) (*Response, error) {
+func start(u Update) (*Response, error) {
 	res := DefaultResponse
 	res.ChatID = u.Message.Chat.ID
-	res.Text = StartMsg
+	res.Text = startMsg
 	return &res, nil
 }
