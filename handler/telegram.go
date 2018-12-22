@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/alpancs/catatan-belanja-bot/telegram"
+	"github.com/alpancs/catatyabot/telegram"
 )
 
 var (
