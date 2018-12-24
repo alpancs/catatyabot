@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/"+os.Getenv("TELEGRAM_BOT_TOKEN"), TelegramHandler)
+	http.HandleFunc("/"+os.Getenv("BOT_TOKEN"), handler)
 	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
