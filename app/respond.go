@@ -21,7 +21,7 @@ func respondUpdate(update *telegram.Update) error {
 	_, err = http.PostForm(apiURL+"sendMessage", url.Values{
 		"chat_id":    {fmt.Sprintf("%d", update.Message.Chat.ID)},
 		"text":       {"```" + string(resp) + "```"},
-		"parse_mode": "Markdown",
+		"parse_mode": {"Markdown"},
 	})
 
 	return err
