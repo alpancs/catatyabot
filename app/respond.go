@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -13,16 +14,22 @@ import (
 var apiURL = fmt.Sprintf("https://api.telegram.org/bot%s/", os.Getenv("BOT_TOKEN"))
 
 func respondUpdate(update *telegram.Update) error {
-	resp, err := json.MarshalIndent(update, "", " ")
+	replyText, err := json.MarshalIndent(update, "", " ")
 	if err != nil {
 		return err
 	}
 
-	_, err = http.PostForm(apiURL+"sendMessage", url.Values{
+	resp, err := http.PostForm(apiURL+"sendMessage", url.Values{
 		"chat_id":    {fmt.Sprintf("%d", update.Message.Chat.ID)},
-		"text":       {"```\n" + string(resp) + "\n```"},
+		"text":       {"```\n" + string(replyText) + "\n```"},
 		"parse_mode": {"Markdown"},
 	})
+
+	if resp.StatusCode >= 300 {
+		fmt.Println("response code:", resp.StatusCode)
+		fmt.Println("response body:")
+		io.Copy(os.Stdout, resp.Body)
+	}
 
 	return err
 }
