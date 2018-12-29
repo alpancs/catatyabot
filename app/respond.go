@@ -19,6 +19,13 @@ func respondUpdate(update *telegram.Update) error {
 		return err
 	}
 
+	if update.Message == nil {
+		update.Message = update.EditedMessage
+	}
+	if update.Message == nil {
+		return nil
+	}
+
 	resp, err := http.PostForm(apiURL+"sendMessage", url.Values{
 		"chat_id":    {fmt.Sprintf("%d", update.Message.Chat.ID)},
 		"text":       {"```\n" + string(replyText) + "\n```"},
