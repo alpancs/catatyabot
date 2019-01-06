@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -32,12 +32,15 @@ func commandCatat(msg *telegram.Message) (bool, error) {
 		resp, err := http.PostForm(sendMessageURL, url.Values{
 			"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
 			"text":         {"apa saja yang ingin dicatat?"},
-			"reply_markup": {"force_reply"},
+			"reply_markup": {`{"force_reply": true}`},
 		})
 		if err == nil && resp.StatusCode >= 300 {
-			fmt.Println("response code:", resp.StatusCode)
-			fmt.Println("response body:")
-			io.Copy(os.Stdout, resp.Body)
+			fmt.Println("response code", resp.StatusCode)
+			if resp.Body != nil {
+				defer resp.Body.Close()
+				body, _ := ioutil.ReadAll(resp.Body)
+				fmt.Println("response body", body)
+			}
 		}
 		return true, err
 	}
