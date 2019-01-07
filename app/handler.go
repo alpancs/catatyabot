@@ -54,11 +54,7 @@ func respondUpdate(update *telegram.Update) error {
 }
 
 func sendMessage(msg *telegram.Message, data url.Values) (*telegram.Message, error) {
-	resp, err := http.PostForm(sendMessageURL, url.Values{
-		"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":         {"apa saja yang ingin dicatat, bos?"},
-		"reply_markup": {`{"force_reply": true}`},
-	})
+	resp, err := http.PostForm(sendMessageURL, data)
 	if err != nil {
 		return nil, err
 	}
