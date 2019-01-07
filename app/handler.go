@@ -14,6 +14,7 @@ import (
 var (
 	apiURL         = fmt.Sprintf("https://api.telegram.org/bot%s/", os.Getenv("BOT_TOKEN"))
 	sendMessageURL = apiURL + "sendMessage"
+	editMessageURL = apiURL + "editMessageText"
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -62,10 +63,23 @@ func sendMessage(msg *telegram.Message, data url.Values) (*telegram.Message, err
 
 	if resp.StatusCode >= 300 {
 		resp.Write(os.Stdout)
-		return nil, err
+		return nil, nil
 	}
 
 	var respMsg telegram.Message
 	err = json.NewDecoder(resp.Body).Decode(&respMsg)
 	return &respMsg, err
+}
+
+func editMessage(msg *telegram.Message, data url.Values) error {
+	resp, err := http.PostForm(editMessageURL, data)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		resp.Write(os.Stdout)
+	}
+	return nil
 }
