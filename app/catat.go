@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
+	"strconv"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var (
-	// tempe 2 ribu
-	// sayur asem 1k
-	patternCatat = regexp.MustCompile(`^.+ \d+(,\d+)?( *(ribu|rb|k|juta|jt))?$`)
-	patternPrice = regexp.MustCompile(`\d+(,\d+)?( *(ribu|rb|k|juta|jt))?$`)
+	patternPrice    = regexp.MustCompile(`\d+(,\d+)?( *(ribu|rb|k|juta|jt))?$`)
+	patternNumber   = regexp.MustCompile(`\d+(,\d+)?`)
+	patternThousand = regexp.MustCompile(`ribu|rb|k`)
+	patternMillion  = regexp.MustCompile(`juta|jt`)
 )
 
 func commandCatat(msg *telegram.Message) (bool, error) {
@@ -38,15 +39,27 @@ func catat(msg *telegram.Message) (bool, error) {
 }
 
 func catatText(msg *telegram.Message, text string) error {
-	if patternCatat.MatchString(text) {
-		price := patternPrice.FindString(text)
-		item := strings.TrimSpace(text[:len(text)-len(price)])
-
+	priceText := patternPrice.FindString(text)
+	item := strings.TrimSpace(text[:len(text)-len(priceText)])
+	if item != "" && priceText != "" {
+		price := parsePrice(priceText)
 		_, err := sendMessage(msg, url.Values{
 			"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
-			"text":    {fmt.Sprintf("%s dengan harga %s akan dicatat ya bos 👌", item, price)},
+			"text":    {fmt.Sprintf("%s dengan harga %d ((pura-pura)) dicatat ya bos 👌", item, price)},
 		})
 		return err
 	}
 	return nil
+}
+
+func parsePrice(text string) int64 {
+	num, _ := strconv.ParseFloat(strings.Replace(patternNumber.FindString(text), ",", ".", 1), 64)
+	switch {
+	case patternThousand.MatchString(text):
+		return int64(num * 1000)
+	case patternMillion.MatchString(text):
+		return int64(num * 1000 * 1000)
+	default:
+		return int64(num)
+	}
 }
