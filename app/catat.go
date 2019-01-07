@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"regexp"
 	"strings"
@@ -20,20 +18,11 @@ var (
 
 func commandCatat(msg *telegram.Message) (bool, error) {
 	if msg.Command() == "catat" {
-		resp, err := http.PostForm(sendMessageURL, url.Values{
+		_, err := sendMessage(msg, url.Values{
 			"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
 			"text":         {"apa saja yang ingin dicatat, bos?"},
 			"reply_markup": {`{"force_reply": true}`},
 		})
-
-		if err == nil && resp.StatusCode >= 300 {
-			fmt.Println("response code", resp.StatusCode)
-			if resp.Body != nil {
-				defer resp.Body.Close()
-				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Println("response body", body)
-			}
-		}
 		return true, err
 	}
 	return false, nil
@@ -53,19 +42,10 @@ func catatText(msg *telegram.Message, text string) error {
 		price := patternPrice.FindString(text)
 		item := strings.TrimSpace(text[:len(text)-len(price)])
 
-		resp, err := http.PostForm(sendMessageURL, url.Values{
+		_, err := sendMessage(msg, url.Values{
 			"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
 			"text":    {fmt.Sprintf("%s dengan harga %s akan dicatat ya bos 👌", item, price)},
 		})
-
-		if err == nil && resp.StatusCode >= 300 {
-			fmt.Println("response code", resp.StatusCode)
-			if resp.Body != nil {
-				defer resp.Body.Close()
-				body, _ := ioutil.ReadAll(resp.Body)
-				fmt.Println("response body", body)
-			}
-		}
 		return err
 	}
 	return nil
