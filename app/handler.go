@@ -40,7 +40,6 @@ func respondUpdate(u *telegram.Update) error {
 	if right, err := commandInsert(u.Message); right {
 		return err
 	}
-
 	if right, err := commandDelete(u.Message); right {
 		return err
 	}

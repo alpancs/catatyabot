@@ -35,7 +35,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 }
 
 func bulkInsert(msg *telegram.Message) (bool, error) {
-	if msg.ReplyToMessage.Text != NewNoteText {
+	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != NewNoteText {
 		return false, nil
 	}
 

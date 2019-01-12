@@ -9,6 +9,10 @@ import (
 )
 
 func update(msg *telegram.Message) (bool, error) {
+	if msg.ReplyToMessage == nil {
+		return false, nil
+	}
+
 	priceText := patternPrice.FindString(msg.Text)
 	item := strings.TrimSpace(msg.Text[:len(msg.Text)-len(priceText)])
 	if item == "" || priceText == "" {
