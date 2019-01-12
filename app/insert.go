@@ -34,20 +34,20 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 	return true, err
 }
 
-func bulkInsert(msg *telegram.Message) (bool, error) {
+func insert(msg *telegram.Message) (bool, error) {
 	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != NewNoteText {
 		return false, nil
 	}
 
 	for _, text := range strings.Split(msg.Text, "\n") {
-		if err := insert(msg, strings.TrimSpace(text)); err != nil {
+		if err := insertSpecificLine(msg, strings.TrimSpace(text)); err != nil {
 			return true, err
 		}
 	}
 	return true, nil
 }
 
-func insert(msg *telegram.Message, text string) error {
+func insertSpecificLine(msg *telegram.Message, text string) error {
 	priceText := patternPrice.FindString(text)
 	item := strings.TrimSpace(text[:len(text)-len(priceText)])
 	if item == "" || priceText == "" {

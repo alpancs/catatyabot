@@ -8,8 +8,12 @@ import (
 )
 
 func commandDelete(msg *telegram.Message) (bool, error) {
-	if msg.Command() != "hapus" || msg.ReplyToMessage == nil {
+	if msg.Command() != "hapus" {
 		return false, nil
+	}
+
+	if msg.ReplyToMessage == nil {
+		return true, helpDelete(msg)
 	}
 
 	_, err := sendMessage(url.Values{
@@ -18,4 +22,13 @@ func commandDelete(msg *telegram.Message) (bool, error) {
 		"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
 	})
 	return true, err
+}
+
+func helpDelete(msg *telegram.Message) error {
+	_, err := sendMessage(url.Values{
+		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":                {"tolong reply ke catatan yang pengen dihapus bos"},
+		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
+	})
+	return err
 }

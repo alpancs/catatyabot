@@ -44,7 +44,7 @@ func respondUpdate(u *telegram.Update) error {
 		return err
 	}
 
-	if right, err := bulkInsert(u.Message); right {
+	if right, err := insert(u.Message); right {
 		return err
 	}
 	if right, err := update(u.Message); right {
