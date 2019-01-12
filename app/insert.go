@@ -23,7 +23,7 @@ var (
 
 func commandInsert(msg *telegram.Message) (bool, error) {
 	if msg.Command() == "catat" {
-		_, err := sendMessage(msg, url.Values{
+		_, err := sendMessage(url.Values{
 			"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
 			"text":         {NewNoteText},
 			"reply_markup": {`{"force_reply": true}`},
@@ -54,7 +54,7 @@ func insert(msg *telegram.Message, text string) error {
 	}
 	price := parsePrice(priceText)
 
-	resp, err := sendMessage(msg, url.Values{
+	resp, err := sendMessage(url.Values{
 		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
 		"text":    {fmt.Sprintf("%s dengan harga %s ((pura-pura)) dicatat ya bos 👌", item, price)},
 	})

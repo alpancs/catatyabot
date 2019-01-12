@@ -54,10 +54,18 @@ func respondUpdate(u *telegram.Update) error {
 		return err
 	}
 
-	return nil
+	return handleElse(u.Message)
 }
 
-func sendMessage(msg *telegram.Message, data url.Values) (*telegram.Message, error) {
+func handleElse(msg *telegram.Message) error {
+	_, err := sendMessage(url.Values{
+		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":    {"ngapain bos? 🙄"},
+	})
+	return err
+}
+
+func sendMessage(data url.Values) (*telegram.Message, error) {
 	resp, err := http.PostForm(sendMessageURL, data)
 	if err != nil {
 		return nil, err
@@ -74,7 +82,7 @@ func sendMessage(msg *telegram.Message, data url.Values) (*telegram.Message, err
 	return &respMsg, err
 }
 
-func editMessage(msg *telegram.Message, data url.Values) error {
+func editMessage(data url.Values) error {
 	resp, err := http.PostForm(editMessageURL, data)
 	if err != nil {
 		return err
