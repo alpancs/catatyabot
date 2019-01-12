@@ -23,3 +23,10 @@ func TestPriceString2500(t *testing.T) {
 func TestPriceString1234567(t *testing.T) {
 	assertEqual(t, "1.234.567", Price(1234567).String())
 }
+
+func BenchmarkPriceString1234567(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Price(1234567).String()
+	}
+	b.ReportAllocs()
+}
