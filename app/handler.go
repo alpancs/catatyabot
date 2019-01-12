@@ -39,15 +39,18 @@ func parseUpdate(body io.ReadCloser) (*telegram.Update, error) {
 	return &update, err
 }
 
-func respondUpdate(update *telegram.Update) error {
-	if update.Message == nil {
+func respondUpdate(u *telegram.Update) error {
+	if u.Message == nil {
 		return nil
 	}
 
-	if right, err := commandInsert(update.Message); right {
+	if right, err := commandInsert(u.Message); right {
 		return err
 	}
-	if right, err := bulkInsert(update.Message); right {
+	if right, err := bulkInsert(u.Message); right {
+		return err
+	}
+	if right, err := update(u.Message); right {
 		return err
 	}
 
