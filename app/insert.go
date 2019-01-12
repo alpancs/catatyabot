@@ -22,15 +22,16 @@ var (
 )
 
 func commandInsert(msg *telegram.Message) (bool, error) {
-	if msg.Command() == "catat" {
-		_, err := sendMessage(url.Values{
-			"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
-			"text":         {NewNoteText},
-			"reply_markup": {`{"force_reply": true}`},
-		})
-		return true, err
+	if msg.Command() != "catat" {
+		return false, nil
 	}
-	return false, nil
+
+	_, err := sendMessage(url.Values{
+		"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":         {NewNoteText},
+		"reply_markup": {`{"force_reply": true}`},
+	})
+	return true, err
 }
 
 func bulkInsert(msg *telegram.Message) (bool, error) {
