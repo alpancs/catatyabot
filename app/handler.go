@@ -44,10 +44,10 @@ func respondUpdate(update *telegram.Update) error {
 		return nil
 	}
 
-	if right, err := commandCatat(update.Message); right {
+	if right, err := commandInsert(update.Message); right {
 		return err
 	}
-	if right, err := catat(update.Message); right {
+	if right, err := bulkInsert(update.Message); right {
 		return err
 	}
 
