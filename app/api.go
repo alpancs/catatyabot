@@ -29,7 +29,7 @@ func sendMessage(data url.Values) (*telegram.Message, error) {
 	}
 
 	var respAPI telegram.APIResponse
-	err = json.NewDecoder(resp.Body, &respAPI)
+	err = json.NewDecoder(resp.Body).Decode(&respAPI)
 	if err != nil {
 		return nil, err
 	}
