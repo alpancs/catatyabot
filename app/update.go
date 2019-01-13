@@ -18,7 +18,7 @@ func update(msg *telegram.Message) (bool, error) {
 	if item == "" || priceText == "" {
 		return true, nil
 	}
-	price := parsePrice(priceText)
+	price := ParsePrice(priceText)
 
 	return true, editMessage(url.Values{
 		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},

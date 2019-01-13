@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
-	"strconv"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const (
-	NewNoteText = "apa saja yang ingin dicatat, bos?"
+	NewNoteText = "apa saja yang pengen dicatat, bos?"
 )
 
 var (
@@ -54,7 +53,7 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 	if item == "" || priceText == "" {
 		return nil
 	}
-	price := parsePrice(priceText)
+	price := ParsePrice(priceText)
 
 	resp, err := sendMessage(url.Values{
 		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
@@ -62,16 +61,4 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 	})
 	fmt.Printf("%#v\n", resp)
 	return err
-}
-
-func parsePrice(text string) Price {
-	num, _ := strconv.ParseFloat(strings.Replace(patternNumber.FindString(text), ",", ".", 1), 64)
-	switch {
-	case patternThousand.MatchString(text):
-		return Price(num * 1000)
-	case patternMillion.MatchString(text):
-		return Price(num * 1000 * 1000)
-	default:
-		return Price(num)
-	}
 }
