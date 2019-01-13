@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	ListText  = "pengen lihat daftar catatan yang mana bos? 👀"
 	Today     = "hari ini"
 	Yesterday = "kemarin"
 	ThisWeek  = "pekan ini"
@@ -43,9 +44,21 @@ func commandList(msg *telegram.Message) (bool, error) {
 
 	_, err := sendMessage(url.Values{
 		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {"pengen lihat daftar catatan yang mana bos? 👀"},
+		"text":                {ListText},
 		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
 		"reply_markup":        {keyboardList},
+	})
+	return true, err
+}
+
+func list(msg *telegram.Message) (bool, error) {
+	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != ListText {
+		return false, nil
+	}
+
+	_, err := sendMessage(url.Values{
+		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":    {"masih kosong bos, kan cuma pura-pura nyatat"},
 	})
 	return true, err
 }

@@ -50,6 +50,9 @@ func respondUpdate(u *telegram.Update) error {
 	if right, err := insert(u.Message); right {
 		return err
 	}
+	if right, err := list(u.Message); right {
+		return err
+	}
 	if right, err := update(u.Message); right {
 		return err
 	}
