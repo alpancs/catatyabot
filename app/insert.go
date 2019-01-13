@@ -27,9 +27,10 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 	}
 
 	_, err := sendMessage(url.Values{
-		"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":         {NewNoteText},
-		"reply_markup": {`{"force_reply": true}`},
+		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":                {NewNoteText},
+		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
+		"reply_markup":        {`{"force_reply": true, "selective": true}`},
 	})
 	return true, err
 }
