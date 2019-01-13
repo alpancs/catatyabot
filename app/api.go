@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -29,7 +30,9 @@ func sendMessage(data url.Values) (*telegram.Message, error) {
 	}
 
 	var respMsg telegram.Message
-	err = json.NewDecoder(resp.Body).Decode(&respMsg)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("resp.Body:", string(body))
+	err = json.Unmarshal(body, &respMsg)
 	return &respMsg, err
 }
 

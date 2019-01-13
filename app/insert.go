@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -59,7 +60,8 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
 		"text":    {fmt.Sprintf("%s dengan harga %s ((pura-pura)) dicatat ya bos 👌", item, price)},
 	})
-	fmt.Printf("%+v\n", resp)
+	respJSON, _ := json.Marshal(resp)
+	fmt.Println(string(respJSON))
 	return err
 }
 
