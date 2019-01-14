@@ -80,6 +80,8 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 	switch interval {
 	case Today:
 		query = fmt.Sprintf(query, "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'", "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'")
+	default:
+		return nil, nil
 	}
 
 	rows, err := db.Query(query, chatID)
