@@ -107,7 +107,7 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 }
 
 func formatItems(title string, items []Item) string {
-	text := fmt.Sprintf("*===== %s =====*\n\n", strings.ToUpper(title))
+	text := fmt.Sprintf("*==== %s ====*\n\n", strings.ToUpper(title))
 	sum := Price(0)
 	for _, item := range items {
 		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
