@@ -16,11 +16,28 @@ func commandDelete(msg *telegram.Message) (bool, error) {
 		return true, helpDelete(msg)
 	}
 
-	_, err := sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {"ini ((pura-pura)) sudah dihapus ya bos 👌"},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
-	})
+	result, err := db.Exec("DELETE FROM items WHERE chat_id = $1 AND message_id = $2;", msg.Chat.ID, msg.ReplyToMessage.MessageID)
+	if err != nil {
+		return true, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return true, err
+	}
+
+	if rowsAffected == 0 {
+		_, err = sendMessage(url.Values{
+			"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
+			"text":                {"hapus apa to bos? 🙄"},
+			"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
+		})
+	} else {
+		_, err = sendMessage(url.Values{
+			"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
+			"text":                {"ini sudah dihapus ya bos 👌"},
+			"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
+		})
+	}
 	return true, err
 }
 
