@@ -18,9 +18,9 @@ const (
 	PastMonth = "bulan lalu"
 )
 
-var keyboardList = buildKeyboardList()
+var replyMarkupList = buildReplyMarkupList()
 
-func buildKeyboardList() string {
+func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
 		Keyboard: [][]telegram.KeyboardButton{
 			{{Text: Today}, {Text: Yesterday}},
@@ -46,7 +46,7 @@ func commandList(msg *telegram.Message) (bool, error) {
 		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
 		"text":                {ListText},
 		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-		"reply_markup":        {keyboardList},
+		"reply_markup":        {replyMarkupList},
 	})
 	return true, err
 }

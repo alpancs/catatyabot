@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	NewNoteText = "apa saja yang pengen dicatat, bos?"
+	NewItemsText = "apa saja yang pengen dicatat, bos?"
 )
 
 var (
@@ -27,7 +27,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 
 	_, err := sendMessage(url.Values{
 		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {NewNoteText},
+		"text":                {NewItemsText},
 		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
 		"reply_markup":        {`{"force_reply": true, "selective": true}`},
 	})
@@ -35,7 +35,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 }
 
 func insert(msg *telegram.Message) (bool, error) {
-	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != NewNoteText {
+	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != NewItemsText {
 		return false, nil
 	}
 
