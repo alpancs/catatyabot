@@ -79,7 +79,11 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 	query := "SELECT name, price FROM items WHERE (chat_id = $1) AND (DATE(created_at) BETWEEN DATE(%s) AND DATE(%s))"
 	switch interval {
 	case Today:
-		query = fmt.Sprintf(query, "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'", "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'")
+		today := "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'"
+		query = fmt.Sprintf(query, today, today)
+	case Yesterday:
+		yesterday := "(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta') - (INTERVAL '1 DAY')"
+		query = fmt.Sprintf(query, yesterday, yesterday)
 	default:
 		return nil, nil
 	}
