@@ -64,7 +64,6 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO items (chat_id, message_id, name, price) VALUES (?, ?, ?, ?);",
-		resp.Chat.ID, resp.MessageID, item, price)
+	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4);", resp.Chat.ID, resp.MessageID, item, price)
 	return err
 }
