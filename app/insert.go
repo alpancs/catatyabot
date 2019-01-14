@@ -56,9 +56,20 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 	price := ParsePrice(priceText)
 
 	resp, err := sendMessage(url.Values{
-		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":    {fmt.Sprintf("%s dengan harga %s ((pura-pura)) dicatat ya bos 👌", item, price)},
+		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":       {fmt.Sprintf("*%s %s* dicatat ya bos 👌", item, price)},
+		"parse_mode": {"Markdown"},
 	})
-	fmt.Printf("%#v\n", resp)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(
+		"INSERT INTO items VALUES (?, ?, ?, ?);",
+		resp.Chat.ID,
+		resp.MessageID,
+		item,
+		price,
+	)
 	return err
 }
