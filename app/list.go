@@ -4,9 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
+
+type Item struct {
+	Name  string
+	Price Price
+}
 
 const (
 	ListText  = "pengen lihat daftar catatan yang mana bos? 👀"
@@ -56,9 +62,49 @@ func list(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessage(url.Values{
-		"chat_id": {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":    {"masih kosong bos, kan cuma pura-pura nyatat"},
+	items, err := queryItems(msg.Chat.ID, msg.Text)
+	if err != nil {
+		return true, err
+	}
+
+	_, err = sendMessage(url.Values{
+		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":       {formatItems("catatan "+msg.Text, items)},
+		"parse_mode": {"Markdown"},
 	})
 	return true, err
+}
+
+func queryItems(chatID int64, interval string) ([]Item, error) {
+	query := "SELECT name, price FROM items WHERE (chat_id = $1) AND (DATE(created_at) BETWEEN DATE(%s) AND DATE(%s))"
+	switch interval {
+	case Today:
+		query = fmt.Sprintf(query, "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'", "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'")
+	}
+
+	rows, err := db.Query(query, chatID)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []Item
+	for rows.Next() {
+		var item Item
+		err = rows.Scan(&item.Name, &item.Price)
+		if err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, nil
+}
+
+func formatItems(title string, items []Item) string {
+	text := fmt.Sprintf("*===== %s =====*\n\n", strings.ToUpper(title))
+	sum := Price(0)
+	for _, item := range items {
+		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
+		sum += item.Price
+	}
+	return fmt.Sprintf("%s\n*TOTAL: %s*", text, sum)
 }
