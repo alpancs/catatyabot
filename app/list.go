@@ -71,7 +71,7 @@ func list(msg *telegram.Message) (bool, error) {
 		"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
 		"text":         {formatItems("catatan "+msg.Text, items)},
 		"parse_mode":   {"Markdown"},
-		"reply_markup": {`{"remove_keyboard": true, "selective": true}`},
+		"reply_markup": {`{"remove_keyboard": true}`},
 	})
 	return true, err
 }
