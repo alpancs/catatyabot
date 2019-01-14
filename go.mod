@@ -1,4 +1,3 @@
-// +heroku install ./app
 module github.com/alpancs/catatyabot
 
 require (

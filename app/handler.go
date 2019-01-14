@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func handler(w http.ResponseWriter, r *http.Request) {
+func Handler(w http.ResponseWriter, r *http.Request) {
 	update, err := parseUpdate(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)

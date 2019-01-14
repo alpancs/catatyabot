@@ -1,8 +1,7 @@
-package main
+package app
 
 import (
 	"database/sql"
-	"net/http"
 	"os"
 
 	_ "github.com/lib/pq"
@@ -16,9 +15,4 @@ func newDatabaseConnection() *sql.DB {
 		panic(err)
 	}
 	return db
-}
-
-func main() {
-	http.HandleFunc("/"+os.Getenv("BOT_TOKEN"), handler)
-	http.ListenAndServe(":"+os.Getenv("PORT"), nil)
 }
