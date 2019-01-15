@@ -77,14 +77,13 @@ func list(msg *telegram.Message) (bool, error) {
 }
 
 func queryItems(chatID int64, interval string) ([]Item, error) {
-	query := "SELECT name, price FROM items WHERE (chat_id = $1) AND (DATE(created_at) BETWEEN DATE(%s) AND DATE(%s))"
+	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s"
+	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	switch interval {
 	case Today:
-		today := "CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta'"
-		query = fmt.Sprintf(query, today, today)
+		query = fmt.Sprintf(query, today, fmt.Sprintf("(%s + INTERVAL '1 DAY')", today))
 	case Yesterday:
-		yesterday := "(CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta') - (INTERVAL '1 DAY')"
-		query = fmt.Sprintf(query, yesterday, yesterday)
+		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
 	default:
 		return nil, nil
 	}
