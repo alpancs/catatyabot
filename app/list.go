@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -77,13 +78,19 @@ func list(msg *telegram.Message) (bool, error) {
 }
 
 func queryItems(chatID int64, interval string) ([]Item, error) {
-	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s"
+	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
 	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
+	lastSunday := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().Weekday())
 	switch interval {
 	case Today:
-		query = fmt.Sprintf(query, today, fmt.Sprintf("(%s + INTERVAL '1 DAY')", today))
+		query = fmt.Sprintf(query, today, tomorrow)
 	case Yesterday:
 		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
+	case ThisWeek:
+		query = fmt.Sprintf(query, lastSunday, tomorrow)
+	case PastWeek:
+		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", lastSunday), lastSunday)
 	default:
 		return nil, nil
 	}
