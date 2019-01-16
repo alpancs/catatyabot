@@ -123,12 +123,12 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 }
 
 func formatItems(title string, items []Item) string {
-	text := fmt.Sprintf("*==== %s ====*\n\n", strings.ToUpper(title))
+	text := fmt.Sprintf("*==== %s ====*\n", strings.ToUpper(title))
 	sum := Price(0)
 	lastDay := 0
 	for _, item := range items {
 		if day := item.CreatedAt.Day(); day != lastDay {
-			text += fmt.Sprintf("_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
+			text += fmt.Sprintf("\n_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
 			lastDay = day
 		}
 		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
