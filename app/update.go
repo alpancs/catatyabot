@@ -37,6 +37,7 @@ func update(msg *telegram.Message) (bool, error) {
 		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
 		"message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
 		"text":       {fmt.Sprintf("*%s %s* dicatat ya bos 👌", item, price)},
+		"parse_mode": {"Markdown"},
 	})
 	if err != nil {
 		return true, err
