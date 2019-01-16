@@ -27,10 +27,6 @@ const (
 )
 
 var (
-	today           = "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	tomorrow        = fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
-	beginOfWeek     = fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
-	beginOfMonth    = "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	monthNames      = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
 	replyMarkupList = buildReplyMarkupList()
 )
@@ -92,6 +88,10 @@ func list(msg *telegram.Message) (bool, error) {
 
 func buildQuery(chatID int64, interval string) string {
 	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = %d", chatID) + " AND created_at >= %s AND created_at < %s ORDER BY created_at;"
+	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
+	beginOfWeek := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	beginOfMonth := "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	switch interval {
 	case Today:
 		return fmt.Sprintf(query, today, tomorrow)
