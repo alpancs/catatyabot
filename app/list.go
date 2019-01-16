@@ -87,7 +87,7 @@ func list(msg *telegram.Message) (bool, error) {
 }
 
 func buildQuerySelect(interval string) string {
-	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND created_at >= (%s) AND created_at < (%s) ORDER BY created_at;"
+	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;"
 
 	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := today + " + INTERVAL '1 DAY'"
