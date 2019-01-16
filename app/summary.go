@@ -74,7 +74,7 @@ func sumInterval(chatID int64, interval string, chanSum chan Price, chanError ch
 }
 
 func buildQuerySum(interval string) string {
-	query := "SELECT SUM(price) FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s);"
+	query := "SELECT COALESCE(SUM(price), 0) FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s);"
 
 	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := today + " + INTERVAL '1 DAY'"
@@ -105,10 +105,7 @@ func buildQuerySum(interval string) string {
 }
 
 func execQuerySum(query string, chatID int64) (Price, error) {
-	var sum *Price
+	var sum Price
 	err := db.QueryRow(query, chatID).Scan(&sum)
-	if sum == nil {
-		return Price(0), err
-	}
-	return *sum, err
+	return sum, err
 }
