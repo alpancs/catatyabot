@@ -81,7 +81,7 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
 	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
-	lastSunday := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().Weekday())
+	lastSunday := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
 	switch interval {
 	case Today:
 		query = fmt.Sprintf(query, today, tomorrow)
