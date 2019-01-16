@@ -27,6 +27,10 @@ const (
 )
 
 var (
+	today           = "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	tomorrow        = fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
+	beginOfWeek     = fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	beginOfMonth    = "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	monthNames      = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
 	replyMarkupList = buildReplyMarkupList()
 )
@@ -67,7 +71,12 @@ func list(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	items, err := queryItems(msg.Chat.ID, msg.Text)
+	query := buildQuery(msg.Chat.ID, msg.Text)
+	if query == "" {
+		return false, nil
+	}
+
+	items, err := queryItems(query)
 	if err != nil {
 		return true, err
 	}
@@ -81,35 +90,31 @@ func list(msg *telegram.Message) (bool, error) {
 	return true, err
 }
 
-func queryItems(chatID int64, interval string) ([]Item, error) {
-	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
-	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
-	beginOfWeek := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
-	beginOfMonth := "DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-
+func buildQuery(chatID int64, interval string) string {
+	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = %d", chatID) + " AND created_at >= %s AND created_at < %s ORDER BY created_at;"
 	switch interval {
 	case Today:
-		query = fmt.Sprintf(query, today, tomorrow)
+		return fmt.Sprintf(query, today, tomorrow)
 	case Yesterday:
-		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
+		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
 	case ThisWeek:
-		query = fmt.Sprintf(query, beginOfWeek, tomorrow)
+		return fmt.Sprintf(query, beginOfWeek, tomorrow)
 	case PastWeek:
-		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", beginOfWeek), beginOfWeek)
+		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", beginOfWeek), beginOfWeek)
 	case ThisMonth:
-		query = fmt.Sprintf(query, beginOfMonth, tomorrow)
+		return fmt.Sprintf(query, beginOfMonth, tomorrow)
 	case PastMonth:
-		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 MONTH')", beginOfMonth), beginOfMonth)
+		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 MONTH')", beginOfMonth), beginOfMonth)
 	default:
-		return nil, nil
+		return ""
 	}
+}
 
-	rows, err := db.Query(query, chatID)
+func queryItems(query string) ([]Item, error) {
+	rows, err := db.Query(query)
 	if err != nil {
 		return nil, err
 	}
-
 	var items []Item
 	for rows.Next() {
 		var item Item
