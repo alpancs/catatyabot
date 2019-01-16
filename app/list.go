@@ -81,16 +81,22 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
 	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
-	lastSunday := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	beginOfWeek := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	beginOfMonth := "DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+
 	switch interval {
 	case Today:
 		query = fmt.Sprintf(query, today, tomorrow)
 	case Yesterday:
 		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
 	case ThisWeek:
-		query = fmt.Sprintf(query, lastSunday, tomorrow)
+		query = fmt.Sprintf(query, beginOfWeek, tomorrow)
 	case PastWeek:
-		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", lastSunday), lastSunday)
+		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", beginOfWeek), beginOfWeek)
+	case ThisMonth:
+		query = fmt.Sprintf(query, beginOfMonth, tomorrow)
+	case PastMonth:
+		query = fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 MONTH')", beginOfMonth), beginOfMonth)
 	default:
 		return nil, nil
 	}
