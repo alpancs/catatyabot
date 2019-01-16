@@ -16,13 +16,35 @@ func update(msg *telegram.Message) (bool, error) {
 	priceText := patternPrice.FindString(msg.Text)
 	item := strings.TrimSpace(msg.Text[:len(msg.Text)-len(priceText)])
 	if item == "" || priceText == "" {
-		return true, nil
+		return false, nil
 	}
 	price := ParsePrice(priceText)
 
-	return true, editMessage(url.Values{
+	result, err := db.Exec("UPDATE items SET name = $3, price = $4 WHERE chat_id = $1 AND message_id = $2;", msg.Chat.ID, msg.ReplyToMessage.MessageID, item, price)
+	if err != nil {
+		return true, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return true, err
+	}
+
+	if rowsAffected == 0 {
+		return false, nil
+	}
+
+	err = editMessage(url.Values{
 		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
 		"message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
-		"text":       {fmt.Sprintf("%s dengan harga %s ((pura-pura)) dicatat ya bos 👌", item, price)},
+		"text":       {fmt.Sprintf("*%s %s* dicatat ya bos 👌", item, price)},
 	})
+	if err != nil {
+		return true, err
+	}
+	_, err = sendMessage(url.Values{
+		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
+		"text":                {"sudah diubah nih bos 👆"},
+		"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
+	})
+	return true, err
 }

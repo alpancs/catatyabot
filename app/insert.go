@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"net/url"
-	"regexp"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -11,13 +10,6 @@ import (
 
 const (
 	NewItemsText = "apa saja yang pengen dicatat, bos?"
-)
-
-var (
-	patternPrice    = regexp.MustCompile(` \d+(,\d+)?( *(ribu|rb|k|juta|jt))?$`)
-	patternNumber   = regexp.MustCompile(`\d+(,\d+)?`)
-	patternThousand = regexp.MustCompile(`ribu|rb|k`)
-	patternMillion  = regexp.MustCompile(`juta|jt`)
 )
 
 func commandInsert(msg *telegram.Message) (bool, error) {

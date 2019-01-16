@@ -34,7 +34,7 @@ func commandDelete(msg *telegram.Message) (bool, error) {
 	} else {
 		_, err = sendMessage(url.Values{
 			"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-			"text":                {"ini sudah dihapus ya bos 👌"},
+			"text":                {"ini sudah dihapus ya bos 🚮"},
 			"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
 		})
 	}
