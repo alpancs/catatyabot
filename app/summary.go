@@ -106,10 +106,9 @@ func buildQuerySum(interval string) string {
 
 func execQuerySum(query string, chatID int64) (Price, error) {
 	var sum *Price
-	err := db.QueryRow(query, chatID).Scan(&sum)
+	err := db.QueryRow(query, chatID).Scan(sum)
 	if sum == nil {
-		p0 := Price(0)
-		sum = &p0
+		return Price(0), err
 	}
 	return *sum, err
 }
