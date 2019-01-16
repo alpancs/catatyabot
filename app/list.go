@@ -87,24 +87,32 @@ func list(msg *telegram.Message) (bool, error) {
 }
 
 func buildQuery(chatID int64, interval string) string {
-	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = %d", chatID) + " AND created_at >= %s AND created_at < %s ORDER BY created_at;"
+	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = %d", chatID)
+	query += " AND created_at >= (%s) AND created_at < (%s) ORDER BY created_at;"
+
 	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
-	beginOfWeek := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	tomorrow := today + " + INTERVAL '1 DAY'"
+	yesterday := today + " - INTERVAL '1 DAY'"
+
+	beginOfWeek := fmt.Sprintf("%s - INTERVAL '%d DAY'", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	beginOfPastWeek := beginOfWeek + " - INTERVAL '7 DAYS'"
+
 	beginOfMonth := "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	beginOfPastMonth := beginOfMonth + " - INTERVAL '1 MONTH'"
+
 	switch interval {
 	case Today:
 		return fmt.Sprintf(query, today, tomorrow)
 	case Yesterday:
-		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 DAY')", today), today)
+		return fmt.Sprintf(query, yesterday, today)
 	case ThisWeek:
 		return fmt.Sprintf(query, beginOfWeek, tomorrow)
 	case PastWeek:
-		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '7 DAYS')", beginOfWeek), beginOfWeek)
+		return fmt.Sprintf(query, beginOfPastWeek, beginOfWeek)
 	case ThisMonth:
 		return fmt.Sprintf(query, beginOfMonth, tomorrow)
 	case PastMonth:
-		return fmt.Sprintf(query, fmt.Sprintf("(%s - INTERVAL '1 MONTH')", beginOfMonth), beginOfMonth)
+		return fmt.Sprintf(query, beginOfPastMonth, beginOfMonth)
 	default:
 		return ""
 	}
