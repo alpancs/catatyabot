@@ -67,12 +67,12 @@ func list(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	query := buildQuerySelect(msg.Chat.ID, msg.Text)
+	query := buildQuerySelect(msg.Text)
 	if query == "" {
 		return false, nil
 	}
 
-	items, err := execQuerySelect(query)
+	items, err := execQuerySelect(query, msg.Chat.ID)
 	if err != nil {
 		return true, err
 	}
@@ -86,9 +86,8 @@ func list(msg *telegram.Message) (bool, error) {
 	return true, err
 }
 
-func buildQuerySelect(chatID int64, interval string) string {
-	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = %d", chatID)
-	query += " AND created_at >= (%s) AND created_at < (%s) ORDER BY created_at;"
+func buildQuerySelect(interval string) string {
+	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND created_at >= (%s) AND created_at < (%s) ORDER BY created_at;"
 
 	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := today + " + INTERVAL '1 DAY'"
@@ -118,8 +117,8 @@ func buildQuerySelect(chatID int64, interval string) string {
 	}
 }
 
-func execQuerySelect(query string) ([]Item, error) {
-	rows, err := db.Query(query)
+func execQuerySelect(query string, chatID int64) ([]Item, error) {
+	rows, err := db.Query(query, chatID)
 	if err != nil {
 		return nil, err
 	}
