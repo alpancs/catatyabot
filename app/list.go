@@ -11,8 +11,9 @@ import (
 )
 
 type Item struct {
-	Name  string
-	Price Price
+	Name      string
+	Price     Price
+	CreatedAt time.Time
 }
 
 const (
@@ -25,7 +26,10 @@ const (
 	PastMonth = "bulan lalu"
 )
 
-var replyMarkupList = buildReplyMarkupList()
+var (
+	monthNames      = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
+	replyMarkupList = buildReplyMarkupList()
+)
 
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
@@ -78,7 +82,7 @@ func list(msg *telegram.Message) (bool, error) {
 }
 
 func queryItems(chatID int64, interval string) ([]Item, error) {
-	query := "SELECT name, price FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
+	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND created_at >= %s AND created_at < %s ORDER BY created_at;"
 	today := "DATE_TRUNC('day', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
 	tomorrow := fmt.Sprintf("(%s + INTERVAL '1 DAY')", today)
 	beginOfWeek := fmt.Sprintf("(%s - INTERVAL '%d DAY')", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
@@ -109,7 +113,7 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 	var items []Item
 	for rows.Next() {
 		var item Item
-		err = rows.Scan(&item.Name, &item.Price)
+		err = rows.Scan(&item.Name, &item.Price, &item.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -121,7 +125,12 @@ func queryItems(chatID int64, interval string) ([]Item, error) {
 func formatItems(title string, items []Item) string {
 	text := fmt.Sprintf("*==== %s ====*\n\n", strings.ToUpper(title))
 	sum := Price(0)
+	lastDay := 0
 	for _, item := range items {
+		if day := item.CreatedAt.Day(); day != lastDay {
+			text += fmt.Sprintf("_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
+			lastDay = day
+		}
 		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
 		sum += item.Price
 	}
