@@ -10,6 +10,7 @@ import (
 
 const (
 	NewItemsText = "apa saja yang pengen dicatat, bos?"
+	SaveTemplate = "*%s %s* dicatat ya bos 👌 #catatan"
 )
 
 func commandInsert(msg *telegram.Message) (bool, error) {
@@ -49,7 +50,7 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 
 	resp, err := sendMessage(url.Values{
 		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":       {fmt.Sprintf("*%s %s* dicatat ya bos 👌", item, price)},
+		"text":       {fmt.Sprintf(SaveTemplate, item, price)},
 		"parse_mode": {"Markdown"},
 	})
 	if err != nil {
