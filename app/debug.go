@@ -38,7 +38,7 @@ func formatItemsDebug(title string, items []Item) string {
 			text += fmt.Sprintf("\n_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
 			lastDay = day
 		}
-		text += fmt.Sprintf("- %s %s %s\n", item.Name, item.Price, item.CreatedAt.Format(time.UnixDate))
+		text += fmt.Sprintf("- %s %s %s\n", item.Name, item.Price, item.CreatedAt.Format(time.RFC3339))
 		sum += item.Price
 	}
 	return fmt.Sprintf("%s\n*TOTAL: %s*", text, sum)
