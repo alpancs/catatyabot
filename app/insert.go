@@ -32,31 +32,39 @@ func insert(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	for _, text := range strings.Split(msg.Text, "\n") {
-		if err := insertSpecificLine(msg, strings.TrimSpace(text)); err != nil {
+	lines := strings.Split(msg.Text, "\n")
+	errs := make(chan error, len(lines))
+	for _, text := range lines {
+		go insertSpecificLine(msg, strings.TrimSpace(text), errs)
+	}
+	for range lines {
+		err := <-errs
+		if err != nil {
 			return true, err
 		}
 	}
 	return true, nil
 }
 
-func insertSpecificLine(msg *telegram.Message, text string) error {
+func insertSpecificLine(msg *telegram.Message, text string, errs chan error) {
 	priceText := patternPrice.FindString(text)
 	item := strings.TrimSpace(text[:len(text)-len(priceText)])
 	if item == "" || priceText == "" {
-		return nil
+		errs <- nil
+		return
 	}
-	price := ParsePrice(priceText)
 
+	price := ParsePrice(priceText)
 	resp, err := sendMessage(url.Values{
 		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
 		"text":       {fmt.Sprintf(SaveTemplate, item, price)},
 		"parse_mode": {"Markdown"},
 	})
 	if err != nil {
-		return err
+		errs <- err
+		return
 	}
 
 	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4);", resp.Chat.ID, resp.MessageID, item, price)
-	return err
+	errs <- err
 }
