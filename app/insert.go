@@ -18,12 +18,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {NewItemsText},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-		"reply_markup":        {`{"force_reply": true, "selective": true}`},
-	})
+	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, msg.MessageID, `{"force_reply":true,"selective":true}`)
 	return true, err
 }
 
@@ -55,11 +50,7 @@ func insertSpecificLine(msg *telegram.Message, text string, errs chan error) {
 	}
 
 	price := ParsePrice(priceText)
-	resp, err := sendMessage(url.Values{
-		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":       {fmt.Sprintf(SaveTemplate, item, price)},
-		"parse_mode": {"Markdown"},
-	})
+	resp, err := sendMessage(msg.Chat.ID, fmt.Sprintf(SaveTemplate, item, price), 0)
 	if err != nil {
 		errs <- err
 		return
@@ -77,9 +68,5 @@ func revertReport(req, resp *telegram.Message, item string, price Price) {
 		"chat_id":    {fmt.Sprintf("%d", resp.Chat.ID)},
 		"message_id": {fmt.Sprintf("%d", resp.MessageID)},
 	})
-	sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", req.Chat.ID)},
-		"text":                {fmt.Sprintf("%s %s gagal dicatat bos 😔 #gagalmaningsonson", item, price)},
-		"reply_to_message_id": {fmt.Sprintf("%d", req.MessageID)},
-	})
+	sendMessage(req.Chat.ID, fmt.Sprintf("%s %s gagal dicatat bos 😔 #gagalmaningsonson", item, price), req.MessageID)
 }

@@ -3,7 +3,6 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -53,12 +52,7 @@ func commandList(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {ListText},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-		"reply_markup":        {replyMarkupList},
-	})
+	_, err := sendMessageCustom(msg.Chat.ID, ListText, msg.MessageID, replyMarkupList)
 	return true, err
 }
 
@@ -77,12 +71,7 @@ func list(msg *telegram.Message) (bool, error) {
 		return true, err
 	}
 
-	_, err = sendMessage(url.Values{
-		"chat_id":      {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":         {formatItems("catatan "+msg.Text, items)},
-		"parse_mode":   {"Markdown"},
-		"reply_markup": {`{"remove_keyboard": true}`},
-	})
+	_, err = sendMessageCustom(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0, `{"remove_keyboard":true}`)
 	return true, err
 }
 

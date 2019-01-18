@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 	"time"
 
@@ -21,11 +20,7 @@ func commandDebug(msg *telegram.Message) (bool, error) {
 		return true, err
 	}
 
-	_, err = sendMessage(url.Values{
-		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":       {formatItemsDebug("rincian 30 catatan terakhir", items)},
-		"parse_mode": {"Markdown"},
-	})
+	_, err = sendMessage(msg.Chat.ID, formatItemsDebug("rincian 30 catatan terakhir", items), 0)
 	return true, err
 }
 

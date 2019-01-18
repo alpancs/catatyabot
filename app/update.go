@@ -42,10 +42,6 @@ func update(msg *telegram.Message) (bool, error) {
 	if err != nil {
 		return true, err
 	}
-	_, err = sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {"sudah diubah nih bos 👆"},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
-	})
+	_, err = sendMessage(msg.Chat.ID, "sudah diubah nih bos 👆", msg.ReplyToMessage.MessageID)
 	return true, err
 }

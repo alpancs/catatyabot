@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"net/url"
 	"time"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -13,20 +12,16 @@ func commandSummary(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	summary, err := sum(msg.Chat.ID)
+	summary, err := buildSummary(msg.Chat.ID)
 	if err != nil {
 		return true, err
 	}
 
-	_, err = sendMessage(url.Values{
-		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":       {summary},
-		"parse_mode": {"Markdown"},
-	})
+	_, err = sendMessage(msg.Chat.ID, summary, 0)
 	return true, err
 }
 
-func sum(chatID int64) (string, error) {
+func buildSummary(chatID int64) (string, error) {
 	chanError := make(chan error, 6)
 	chanToday := make(chan Price, 1)
 	chanYesterday := make(chan Price, 1)

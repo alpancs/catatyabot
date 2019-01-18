@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -68,10 +67,6 @@ func respondUpdate(u *telegram.Update) error {
 }
 
 func handleElse(msg *telegram.Message) error {
-	_, err := sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {"ngapain bos? 🙄"},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-	})
+	_, err := sendMessage(msg.Chat.ID, "ngapain bos? 🙄", msg.MessageID)
 	return err
 }

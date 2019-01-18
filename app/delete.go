@@ -1,9 +1,6 @@
 package app
 
 import (
-	"fmt"
-	"net/url"
-
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -26,26 +23,14 @@ func commandDelete(msg *telegram.Message) (bool, error) {
 	}
 
 	if rowsAffected == 0 {
-		_, err = sendMessage(url.Values{
-			"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-			"text":                {"hapus apa to bos? 🙄"},
-			"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-		})
+		_, err = sendMessage(msg.Chat.ID, "hapus apa to bos? 🙄", msg.MessageID)
 	} else {
-		_, err = sendMessage(url.Values{
-			"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-			"text":                {"ini sudah dihapus ya bos 🚮"},
-			"reply_to_message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
-		})
+		_, err = sendMessage(msg.Chat.ID, "ini sudah dihapus ya bos 🚮", msg.ReplyToMessage.MessageID)
 	}
 	return true, err
 }
 
 func helpDelete(msg *telegram.Message) error {
-	_, err := sendMessage(url.Values{
-		"chat_id":             {fmt.Sprintf("%d", msg.Chat.ID)},
-		"text":                {"tolong reply ke catatan yang pengen dihapus ya bos"},
-		"reply_to_message_id": {fmt.Sprintf("%d", msg.MessageID)},
-	})
+	_, err := sendMessage(msg.Chat.ID, "tolong reply ke catatan yang pengen dihapus ya bos", msg.MessageID)
 	return err
 }
