@@ -27,39 +27,57 @@ func insert(msg *telegram.Message) (bool, error) {
 	}
 
 	lines := strings.Split(msg.Text, "\n")
-	errs := make(chan error, len(lines))
-	for _, text := range lines {
-		go insertSpecificLine(msg, strings.TrimSpace(text), errs)
+	numWorkers := len(lines)
+	if numWorkers > 5 {
+		numWorkers = 5
 	}
-	for range lines {
-		err := <-errs
-		if err != nil {
-			return true, err
-		}
-	}
-	return true, nil
+	return true, insertByWorkers(numWorkers, msg, lines)
 }
 
-func insertSpecificLine(msg *telegram.Message, text string, errs chan error) {
+func insertByWorkers(numWorkers int, msg *telegram.Message, lines []string) error {
+	chanText := make(chan string)
+	chanError := make(chan error, len(lines))
+	for i := 0; i < numWorkers; i++ {
+		go worker(msg, chanText, chanError)
+	}
+	for _, text := range lines {
+		chanText <- text
+	}
+	close(chanText)
+
+	for range lines {
+		err := <-chanError
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func worker(msg *telegram.Message, chanText <-chan string, chanError chan error) {
+	for text := range chanText {
+		chanError <- insertSpecificLine(msg, strings.TrimSpace(text))
+	}
+}
+
+func insertSpecificLine(msg *telegram.Message, text string) error {
 	priceText := patternPrice.FindString(text)
 	item := strings.TrimSpace(text[:len(text)-len(priceText)])
 	if item == "" || priceText == "" {
-		errs <- nil
-		return
+		return nil
 	}
 
 	price := ParsePrice(priceText)
 	resp, err := sendMessage(msg.Chat.ID, fmt.Sprintf(SaveTemplate, item, price), 0)
 	if err != nil {
-		errs <- err
-		return
+		return err
 	}
 
 	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4);", resp.Chat.ID, resp.MessageID, item, price)
-	errs <- err
 	if err != nil {
 		revertReport(msg, resp, item, price)
 	}
+	return err
 }
 
 func revertReport(req, resp *telegram.Message, item string, price Price) {
