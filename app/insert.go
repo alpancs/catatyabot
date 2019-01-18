@@ -67,4 +67,19 @@ func insertSpecificLine(msg *telegram.Message, text string, errs chan error) {
 
 	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4);", resp.Chat.ID, resp.MessageID, item, price)
 	errs <- err
+	if err != nil {
+		revertReport(msg, resp, item, price)
+	}
+}
+
+func revertReport(req, resp *telegram.Message, item string, price Price) {
+	deleteMessage(url.Values{
+		"chat_id":    {fmt.Sprintf("%d", resp.Chat.ID)},
+		"message_id": {fmt.Sprintf("%d", resp.MessageID)},
+	})
+	sendMessage(url.Values{
+		"chat_id":             {fmt.Sprintf("%d", req.Chat.ID)},
+		"text":                {fmt.Sprintf("%s %s gagal dicatat bos 😔 #gagalmaningsonson", item, price)},
+		"reply_to_message_id": {fmt.Sprintf("%d", req.MessageID)},
+	})
 }
