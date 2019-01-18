@@ -11,16 +11,18 @@ import (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	go handleReqAsync(r)
+}
+
+func handleReqAsync(r *http.Request) {
 	update, err := parseUpdate(r.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
 		fmt.Println(err)
 		return
 	}
 
 	err = respondUpdate(update)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		fmt.Println(err)
 	}
 }
