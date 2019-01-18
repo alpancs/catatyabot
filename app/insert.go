@@ -17,7 +17,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, msg.MessageID, `{"force_reply":true,"selective":true}`)
+	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, 0, `{"force_reply":true,"selective":true}`)
 	return true, err
 }
 

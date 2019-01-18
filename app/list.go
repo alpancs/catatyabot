@@ -26,8 +26,12 @@ const (
 )
 
 var (
-	monthNames      = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"}
+	monthNames = []string{"Januari", "Februari", "Maret", "April",
+		"Mei", "Juni", "Juli", "Agustus",
+		"September", "Oktober", "November", "Desember"}
+
 	replyMarkupList = buildReplyMarkupList()
+	removeKeyboard  = `{"remove_keyboard":true}`
 )
 
 func buildReplyMarkupList() string {
@@ -52,7 +56,7 @@ func commandList(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessageCustom(msg.Chat.ID, ListText, msg.MessageID, replyMarkupList)
+	_, err := sendMessageCustom(msg.Chat.ID, ListText, 0, replyMarkupList)
 	return true, err
 }
 
@@ -71,7 +75,7 @@ func list(msg *telegram.Message) (bool, error) {
 		return true, err
 	}
 
-	_, err = sendMessageCustom(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0, `{"remove_keyboard":true}`)
+	_, err = sendMessageCustom(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0, removeKeyboard)
 	return true, err
 }
 
