@@ -11,24 +11,23 @@ import (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
-	go handleReqAsync(r)
-}
-
-func handleReqAsync(r *http.Request) {
+	defer r.Body.Close()
 	update, err := parseUpdate(r.Body)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	go respondUpdateAsync(update)
+}
 
-	err = respondUpdate(update)
+func respondUpdateAsync(update *telegram.Update) {
+	err := respondUpdate(update)
 	if err != nil {
 		fmt.Println(err)
 	}
 }
 
-func parseUpdate(body io.ReadCloser) (*telegram.Update, error) {
-	defer body.Close()
+func parseUpdate(body io.Reader) (*telegram.Update, error) {
 	var update telegram.Update
 	err := json.NewDecoder(body).Decode(&update)
 	return &update, err
