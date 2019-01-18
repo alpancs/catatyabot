@@ -43,7 +43,6 @@ func buildReplyMarkupList() string {
 		},
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,
-		Selective:       true,
 	})
 	if err != nil {
 		panic(err)
