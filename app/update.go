@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -33,12 +32,7 @@ func update(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	err = editMessage(url.Values{
-		"chat_id":    {fmt.Sprintf("%d", msg.Chat.ID)},
-		"message_id": {fmt.Sprintf("%d", msg.ReplyToMessage.MessageID)},
-		"text":       {fmt.Sprintf(SaveTemplate, item, price)},
-		"parse_mode": {"Markdown"},
-	})
+	err = editMessage(msg.Chat.ID, msg.ReplyToMessage.MessageID, fmt.Sprintf(SaveTemplate, item, price))
 	if err != nil {
 		return true, err
 	}

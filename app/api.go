@@ -61,10 +61,18 @@ func updateMessage(url string, data url.Values) error {
 	return nil
 }
 
-func editMessage(data url.Values) error {
-	return updateMessage(editMessageURL, data)
+func editMessage(chatID int64, messageID int, text string) error {
+	return updateMessage(editMessageURL, url.Values{
+		"chat_id":    {strconv.FormatInt(chatID, 10)},
+		"message_id": {strconv.Itoa(messageID)},
+		"text":       {text},
+		"parse_mode": {"Markdown"},
+	})
 }
 
-func deleteMessage(data url.Values) error {
-	return updateMessage(deleteMessageURL, data)
+func deleteMessage(chatID int64, messageID int) error {
+	return updateMessage(deleteMessageURL, url.Values{
+		"chat_id":    {strconv.FormatInt(chatID, 10)},
+		"message_id": {strconv.Itoa(messageID)},
+	})
 }

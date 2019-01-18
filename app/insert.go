@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"net/url"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -64,9 +63,6 @@ func insertSpecificLine(msg *telegram.Message, text string, errs chan error) {
 }
 
 func revertReport(req, resp *telegram.Message, item string, price Price) {
-	deleteMessage(url.Values{
-		"chat_id":    {fmt.Sprintf("%d", resp.Chat.ID)},
-		"message_id": {fmt.Sprintf("%d", resp.MessageID)},
-	})
+	deleteMessage(resp.Chat.ID, resp.MessageID)
 	sendMessage(req.Chat.ID, fmt.Sprintf("%s %s gagal dicatat bos 😔 #gagalmaningsonson", item, price), req.MessageID)
 }
