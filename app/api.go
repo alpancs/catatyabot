@@ -44,6 +44,9 @@ func sendMessageCustom(chatID int64, text string, replyToMessageID int, replyMar
 	if err != nil {
 		return nil, err
 	}
+	if !respAPI.Ok {
+		return nil, fmt.Errorf("error_code: %d, description: %s", respAPI.ErrorCode, respAPI.Description)
+	}
 	var respMsg telegram.Message
 	err = json.Unmarshal(respAPI.Result, &respMsg)
 	return &respMsg, err
