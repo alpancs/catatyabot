@@ -9,7 +9,7 @@ import (
 )
 
 func commandSummary(msg *telegram.Message) (bool, error) {
-	if msg.Command() != "rangkuman" {
+	if msg.Command() != "rangkum" {
 		return false, nil
 	}
 
@@ -48,7 +48,7 @@ func sum(chatID int64) (string, error) {
 		}
 	}
 
-	return fmt.Sprintf(`*==== RANGKUMAN ====*
+	return fmt.Sprintf(`*=== RANGKUMAN ===*
 
 - %s: %s
 - %s: %s

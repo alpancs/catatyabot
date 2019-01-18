@@ -135,7 +135,7 @@ func execQuerySelect(query string, chatID int64) ([]Item, error) {
 }
 
 func formatItems(title string, items []Item) string {
-	text := fmt.Sprintf("*==== %s ====*\n", strings.ToUpper(title))
+	text := fmt.Sprintf("*=== %s ===*\n", strings.ToUpper(title))
 	sum := Price(0)
 	lastDay := 0
 	for _, item := range items {
