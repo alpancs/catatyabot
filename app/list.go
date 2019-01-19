@@ -36,7 +36,6 @@ var (
 	timeBeginOfPastMonth = timeBeginOfMonth + " - INTERVAL '1 MONTH'"
 
 	replyMarkupList = buildReplyMarkupList()
-	removeKeyboard  = `{"remove_keyboard":true}`
 )
 
 func timeBeginOfWeek() string {
@@ -87,7 +86,7 @@ func list(msg *telegram.Message) (bool, error) {
 		return true, err
 	}
 
-	_, err = sendMessageCustom(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0, removeKeyboard)
+	_, err = sendMessage(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0)
 	return true, err
 }
 
