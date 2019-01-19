@@ -26,25 +26,10 @@ const (
 )
 
 var (
-	monthNames = []string{"Januari", "Februari", "Maret", "April",
-		"Mei", "Juni", "Juli", "Agustus",
-		"September", "Oktober", "November", "Desember"}
-	timeToday            = "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	timeTomorrow         = timeToday + " + INTERVAL '1 DAY'"
-	timeYesterday        = timeToday + " - INTERVAL '1 DAY'"
-	timeBeginOfMonth     = "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	timeBeginOfPastMonth = timeBeginOfMonth + " - INTERVAL '1 MONTH'"
-
+	monthNames = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni",
+		"Juli", "Agustus", "September", "Oktober", "November", "Desember"}
 	replyMarkupList = buildReplyMarkupList()
 )
-
-func timeBeginOfWeek() string {
-	day := time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday()
-	return fmt.Sprintf("%s - INTERVAL '%d DAY'", timeToday, day)
-}
-func timeBeginOfPastWeek() string {
-	return timeBeginOfWeek() + " - INTERVAL '7 DAYS'"
-}
 
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
@@ -92,26 +77,33 @@ func list(msg *telegram.Message) (bool, error) {
 
 func buildQuerySelect(interval string) string {
 	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;"
-	return fillQuery(query, interval)
+	start, end := buildIntervalSQL(interval)
+	return fmt.Sprintf(query, start, end)
 }
 
-func fillQuery(query, interval string) string {
+func buildIntervalSQL(interval string) (string, string) {
+	timeToday := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	timeTomorrow := timeToday + " + INTERVAL '1 DAY'"
+	timeYesterday := timeToday + " - INTERVAL '1 DAY'"
+	timeBeginOfWeek := fmt.Sprintf("%s - INTERVAL '%d DAY'", timeToday, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
+	timeBeginOfPastWeek := timeBeginOfWeek + " - INTERVAL '7 DAYS'"
+	timeBeginOfMonth := "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	timeBeginOfPastMonth := timeBeginOfMonth + " - INTERVAL '1 MONTH'"
 	switch interval {
 	case Today:
-		return fmt.Sprintf(query, timeToday, timeTomorrow)
+		return timeToday, timeTomorrow
 	case Yesterday:
-		return fmt.Sprintf(query, timeYesterday, timeToday)
+		return timeYesterday, timeToday
 	case ThisWeek:
-		return fmt.Sprintf(query, timeBeginOfWeek(), timeTomorrow)
+		return timeBeginOfWeek, timeTomorrow
 	case PastWeek:
-		return fmt.Sprintf(query, timeBeginOfPastWeek(), timeBeginOfWeek())
+		return timeBeginOfPastWeek, timeBeginOfWeek
 	case ThisMonth:
-		return fmt.Sprintf(query, timeBeginOfMonth, timeTomorrow)
+		return timeBeginOfMonth, timeTomorrow
 	case PastMonth:
-		return fmt.Sprintf(query, timeBeginOfPastMonth, timeBeginOfMonth)
-	default:
-		return ""
+		return timeBeginOfPastMonth, timeBeginOfMonth
 	}
+	return "", ""
 }
 
 func execQuerySelect(query string, chatID int64) ([]Item, error) {
