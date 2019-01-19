@@ -29,10 +29,23 @@ var (
 	monthNames = []string{"Januari", "Februari", "Maret", "April",
 		"Mei", "Juni", "Juli", "Agustus",
 		"September", "Oktober", "November", "Desember"}
+	timeToday            = "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	timeTomorrow         = timeToday + " + INTERVAL '1 DAY'"
+	timeYesterday        = timeToday + " - INTERVAL '1 DAY'"
+	timeBeginOfMonth     = "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
+	timeBeginOfPastMonth = timeBeginOfMonth + " - INTERVAL '1 MONTH'"
 
 	replyMarkupList = buildReplyMarkupList()
 	removeKeyboard  = `{"remove_keyboard":true}`
 )
+
+func timeBeginOfWeek() string {
+	day := time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday()
+	return fmt.Sprintf("%s - INTERVAL '%d DAY'", timeToday, day)
+}
+func timeBeginOfPastWeek() string {
+	return timeBeginOfWeek() + " - INTERVAL '7 DAYS'"
+}
 
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
@@ -80,30 +93,23 @@ func list(msg *telegram.Message) (bool, error) {
 
 func buildQuerySelect(interval string) string {
 	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;"
+	return fillQuery(query, interval)
+}
 
-	today := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	tomorrow := today + " + INTERVAL '1 DAY'"
-	yesterday := today + " - INTERVAL '1 DAY'"
-
-	beginOfWeek := fmt.Sprintf("%s - INTERVAL '%d DAY'", today, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
-	beginOfPastWeek := beginOfWeek + " - INTERVAL '7 DAYS'"
-
-	beginOfMonth := "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	beginOfPastMonth := beginOfMonth + " - INTERVAL '1 MONTH'"
-
+func fillQuery(query, interval string) string {
 	switch interval {
 	case Today:
-		return fmt.Sprintf(query, today, tomorrow)
+		return fmt.Sprintf(query, timeToday, timeTomorrow)
 	case Yesterday:
-		return fmt.Sprintf(query, yesterday, today)
+		return fmt.Sprintf(query, timeYesterday, timeToday)
 	case ThisWeek:
-		return fmt.Sprintf(query, beginOfWeek, tomorrow)
+		return fmt.Sprintf(query, timeBeginOfWeek(), timeTomorrow)
 	case PastWeek:
-		return fmt.Sprintf(query, beginOfPastWeek, beginOfWeek)
+		return fmt.Sprintf(query, timeBeginOfPastWeek(), timeBeginOfWeek())
 	case ThisMonth:
-		return fmt.Sprintf(query, beginOfMonth, tomorrow)
+		return fmt.Sprintf(query, timeBeginOfMonth, timeTomorrow)
 	case PastMonth:
-		return fmt.Sprintf(query, beginOfPastMonth, beginOfMonth)
+		return fmt.Sprintf(query, timeBeginOfPastMonth, timeBeginOfMonth)
 	default:
 		return ""
 	}
