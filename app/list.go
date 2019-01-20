@@ -61,11 +61,12 @@ func list(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	query := buildQuerySelect(msg.Text)
-	if query == "" {
+	start, end := buildIntervalSQL(msg.Text)
+	if start == "" || end == "" {
 		return false, nil
 	}
 
+	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;", start, end)
 	items, err := execQuerySelect(query, msg.Chat.ID)
 	if err != nil {
 		return true, err
@@ -73,12 +74,6 @@ func list(msg *telegram.Message) (bool, error) {
 
 	_, err = sendMessage(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0)
 	return true, err
-}
-
-func buildQuerySelect(interval string) string {
-	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;"
-	start, end := buildIntervalSQL(interval)
-	return fmt.Sprintf(query, start, end)
 }
 
 func buildIntervalSQL(interval string) (string, string) {

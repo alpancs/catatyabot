@@ -62,18 +62,14 @@ func buildSummary(chatID int64) (string, error) {
 }
 
 func sumInterval(chatID int64, interval string, chanSum chan Price, chanError chan error) {
-	s, err := execQuerySum(buildQuerySum(interval), chatID)
+	s, err := querySum(chatID, interval)
 	chanSum <- s
 	chanError <- err
 }
 
-func buildQuerySum(interval string) string {
-	query := "SELECT COALESCE(SUM(price), 0) FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s);"
+func querySum(chatID int64, interval string) (Price, error) {
 	start, end := buildIntervalSQL(interval)
-	return fmt.Sprintf(query, start, end)
-}
-
-func execQuerySum(query string, chatID int64) (Price, error) {
+	query := fmt.Sprintf("SELECT COALESCE(SUM(price), 0) FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s);", start, end)
 	var sum Price
 	err := db.QueryRow(query, chatID).Scan(&sum)
 	return sum, err
