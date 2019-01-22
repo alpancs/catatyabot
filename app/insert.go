@@ -8,7 +8,11 @@ import (
 )
 
 const (
-	NewItemsText = "apa saja yang pengen dicatat, bos?"
+	NewItemsText = `apa saja yang pengen dicatat, bos?
+
+*contoh:
+_sayur kangkung 2 ribu_
+_lombok 1/2 kg 3,5k_`
 	SaveTemplate = "*%s %s* dicatat ya bos 👌 #catatan"
 )
 
