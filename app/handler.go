@@ -33,40 +33,39 @@ func parseUpdate(body io.Reader) (*telegram.Update, error) {
 }
 
 func respondUpdate(u *telegram.Update) error {
-	if u.Message == nil {
+	msg := u.Message
+	if msg == nil {
 		return nil
 	}
 
-	if right, err := commandInsert(u.Message); right {
+	if right, err := commandInsert(msg); right {
 		return err
 	}
-	if right, err := commandDelete(u.Message); right {
+	if right, err := commandDelete(msg); right {
 		return err
 	}
-	if right, err := commandList(u.Message); right {
+	if right, err := commandList(msg); right {
 		return err
 	}
-	if right, err := commandSummary(u.Message); right {
+	if right, err := commandSummary(msg); right {
 		return err
 	}
-	if right, err := commandDebug(u.Message); right {
+	if right, err := commandStart(msg); right {
 		return err
 	}
-
-	if right, err := insert(u.Message); right {
-		return err
-	}
-	if right, err := list(u.Message); right {
-		return err
-	}
-	if right, err := update(u.Message); right {
+	if right, err := commandDebug(msg); right {
 		return err
 	}
 
-	return handleElse(u.Message)
-}
+	if right, err := insert(msg); right {
+		return err
+	}
+	if right, err := list(msg); right {
+		return err
+	}
+	if right, err := update(msg); right {
+		return err
+	}
 
-func handleElse(msg *telegram.Message) error {
-	_, err := sendMessage(msg.Chat.ID, "ngapain bos? 🙄", msg.MessageID)
-	return err
+	return other(msg)
 }
