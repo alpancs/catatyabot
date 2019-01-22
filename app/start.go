@@ -11,7 +11,7 @@ const StartMessage = `cara Asisten Belanja membantu anda:
 - /lihat untuk melihat catatan 👀
 - /rangkum untuk melihat rangkuman catatan 💰
 
-selain itu, anda juga dapat mengubah catatan, dengan cara membalas/_reply_ ke pesan #catatan yang ingin diubah. cukup sebutkan nama barang serta harga barang yang baru.
+selain itu, anda juga dapat mengubah catatan dengan cara membalas/_reply_ ke pesan #catatan yang ingin diubah, lalu sebutkan nama barang serta harga barang yang baru
 `
 
 func commandStart(msg *telegram.Message) (bool, error) {
