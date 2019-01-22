@@ -4,7 +4,7 @@ import (
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-const StartMessage = `Cara @catatyabot membantu anda:
+const StartMessage = `*Cara @catatyabot membantu anda:*
 - undang @catatyabot ke grup Telegram keluarga anda
 - /catat untuk memanggil bot supaya bersiap mencatat 📝
 - /hapus untuk menghapus catatan 🗑️
