@@ -10,7 +10,7 @@ type Price int64
 
 var (
 	patternPrice    = regexp.MustCompile(` \d+(,\d+)?( *(ribu|rb|k|juta|jt))?$`)
-	patternNumber   = regexp.MustCompile(`\d+(,\d+)?`)
+	patternNumber   = regexp.MustCompile(`\d+((,|.)\d+)?`)
 	patternThousand = regexp.MustCompile(`ribu|rb|k`)
 	patternMillion  = regexp.MustCompile(`juta|jt`)
 )
