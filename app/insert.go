@@ -12,12 +12,16 @@ const (
 	SaveTemplate = "*%s %s* dicatat ya bos 👌 #catatan"
 )
 
+var (
+	forceReply = `{"force_reply":true}`
+)
+
 func commandInsert(msg *telegram.Message) (bool, error) {
 	if msg.Command() != "catat" {
 		return false, nil
 	}
 
-	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, 0, `{"force_reply":true}`)
+	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, 0, forceReply)
 	return true, err
 }
 

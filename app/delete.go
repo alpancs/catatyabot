@@ -1,8 +1,6 @@
 package app
 
 import (
-	"encoding/json"
-	"fmt"
 	"strings"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -29,8 +27,6 @@ func commandDelete(msg *telegram.Message) (bool, error) {
 	if rowsAffected == 0 {
 		_, err = sendMessage(msg.Chat.ID, "hapus apa to bos? 🙄", msg.MessageID)
 	} else {
-		fmt.Println(json.Marshal(msg.ReplyToMessage))
-		fmt.Println(strings.Replace(msg.ReplyToMessage.Text, " #catatan", "", -1))
 		editMessage(msg.Chat.ID, msg.ReplyToMessage.MessageID, strings.Replace(msg.ReplyToMessage.Text, " #catatan", "", -1))
 		_, err = sendMessage(msg.Chat.ID, "ini sudah dihapus ya bos 🚮", msg.ReplyToMessage.MessageID)
 	}

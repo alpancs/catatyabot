@@ -29,6 +29,7 @@ var (
 	monthNames = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni",
 		"Juli", "Agustus", "September", "Oktober", "November", "Desember"}
 	replyMarkupList = buildReplyMarkupList()
+	removeMarkup    = `{"remove_keyboard":true}`
 )
 
 func buildReplyMarkupList() string {
@@ -68,7 +69,7 @@ func list(msg *telegram.Message) (bool, error) {
 		return true, err
 	}
 
-	_, err = sendMessage(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0)
+	_, err = sendMessageCustom(msg.Chat.ID, formatItems("catatan "+msg.Text, items), 0, removeMarkup)
 	return true, err
 }
 

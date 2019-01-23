@@ -19,7 +19,7 @@ var (
 )
 
 func sendMessage(chatID int64, text string, replyToMessageID int) (*telegram.Message, error) {
-	return sendMessageCustom(chatID, text, replyToMessageID, `{"remove_keyboard":true}`)
+	return sendMessageCustom(chatID, text, replyToMessageID, "")
 }
 func sendMessageCustom(chatID int64, text string, replyToMessageID int, replyMarkup string) (*telegram.Message, error) {
 	resp, err := http.PostForm(sendMessageURL, url.Values{
