@@ -18,11 +18,7 @@ _sayur kangkung 2 ribu_
 _lombok 1/2 kg 3,5k_
 _motor CB150R 27jt_`
 
-func commandStart(msg *telegram.Message) (bool, error) {
-	if msg.Command() != "start" {
-		return false, nil
-	}
-
+func help(msg *telegram.Message) error {
 	_, err := sendMessage(msg.Chat.ID, StartMessage, 0)
-	return true, err
+	return err
 }
