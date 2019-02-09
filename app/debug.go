@@ -27,11 +27,9 @@ func commandDebug(msg *telegram.Message) (bool, error) {
 func formatItemsDebug(title string, items []Item) string {
 	text := fmt.Sprintf("*=== %s ===*\n", strings.ToUpper(title))
 	sum := Price(0)
-	lastDay := 0
-	for _, item := range items {
-		if day := item.CreatedAt.Day(); day != lastDay {
-			text += fmt.Sprintf("\n_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
-			lastDay = day
+	for i, item := range items {
+		if i == 0 || item.CreatedAt.Day() != items[i-1].CreatedAt.Day() {
+			text += fmt.Sprintf("\n_%d %s_\n", item.CreatedAt.Day(), monthNames[item.CreatedAt.Month()-time.January])
 		}
 		text += fmt.Sprintf("- %s %s %s\n", item.Name, item.Price, item.CreatedAt.Format(time.RFC3339))
 		sum += item.Price
