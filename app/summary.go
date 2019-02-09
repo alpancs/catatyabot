@@ -29,12 +29,12 @@ func buildSummary(chatID int64) (string, error) {
 	chanThisMonth := make(chan Price, 1)
 	chanPastMonth := make(chan Price, 1)
 
-	go sumInterval(chatID, Today, chanToday, chanError)
-	go sumInterval(chatID, Yesterday, chanYesterday, chanError)
-	go sumInterval(chatID, ThisWeek, chanThisWeek, chanError)
-	go sumInterval(chatID, PastWeek, chanPastWeek, chanError)
-	go sumInterval(chatID, ThisMonth, chanThisMonth, chanError)
-	go sumInterval(chatID, PastMonth, chanPastMonth, chanError)
+	go sumInterval(chatID, TextToday, chanToday, chanError)
+	go sumInterval(chatID, TextYesterday, chanYesterday, chanError)
+	go sumInterval(chatID, TextThisWeek, chanThisWeek, chanError)
+	go sumInterval(chatID, TextPastWeek, chanPastWeek, chanError)
+	go sumInterval(chatID, TextThisMonth, chanThisMonth, chanError)
+	go sumInterval(chatID, TextPastMonth, chanPastMonth, chanError)
 
 	for i := 0; i < 6; i++ {
 		if err := <-chanError; err != nil {
@@ -52,12 +52,12 @@ func buildSummary(chatID int64) (string, error) {
 
 - %s: %s
 - %s: %s`,
-		Today, <-chanToday,
-		Yesterday, <-chanYesterday,
-		ThisWeek, <-chanThisWeek,
-		PastWeek, <-chanPastWeek,
-		ThisMonth, <-chanThisMonth,
-		PastMonth, <-chanPastMonth,
+		TextToday, <-chanToday,
+		TextYesterday, <-chanYesterday,
+		TextThisWeek, <-chanThisWeek,
+		TextPastWeek, <-chanPastWeek,
+		TextThisMonth, <-chanThisMonth,
+		TextPastMonth, <-chanPastMonth,
 	), nil
 }
 
@@ -69,8 +69,8 @@ func sumInterval(chatID int64, interval string, chanSum chan Price, chanError ch
 
 func querySum(chatID int64, interval string) (Price, error) {
 	start, end := buildIntervalSQL(interval)
-	query := fmt.Sprintf("SELECT COALESCE(SUM(price), 0) FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s);", start, end)
+	query := "SELECT COALESCE(SUM(price), 0) FROM items WHERE chat_id = $1 AND $2 <= created_at AND created_at < $3;"
 	var sum Price
-	err := db.QueryRow(query, chatID).Scan(&sum)
+	err := db.QueryRow(query, chatID, start, end).Scan(&sum)
 	return sum, err
 }

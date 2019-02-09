@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -77,7 +78,7 @@ func insertSpecificLine(msg *telegram.Message, text string) error {
 		return err
 	}
 
-	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4);", resp.Chat.ID, resp.MessageID, item, price)
+	_, err = db.Exec("INSERT INTO items VALUES ($1, $2, $3, $4, $5);", resp.Chat.ID, resp.MessageID, item, price, time.Now().In(time.UTC))
 	if err != nil {
 		revertReport(msg, resp, item, price)
 	}

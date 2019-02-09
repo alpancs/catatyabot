@@ -16,16 +16,17 @@ type Item struct {
 }
 
 const (
-	ListText  = "pengen lihat daftar catatan yang mana bos? 👀"
-	Today     = "hari ini"
-	Yesterday = "kemarin"
-	ThisWeek  = "pekan ini"
-	PastWeek  = "pekan lalu"
-	ThisMonth = "bulan ini"
-	PastMonth = "bulan lalu"
+	TextList      = "pengen lihat daftar catatan yang mana bos? 👀"
+	TextToday     = "hari ini"
+	TextYesterday = "kemarin"
+	TextThisWeek  = "pekan ini"
+	TextPastWeek  = "pekan lalu"
+	TextThisMonth = "bulan ini"
+	TextPastMonth = "bulan lalu"
 )
 
 var (
+	tzWIB      = time.FixedZone("WIB", 7*60*60)
 	monthNames = []string{"Januari", "Februari", "Maret", "April", "Mei", "Juni",
 		"Juli", "Agustus", "September", "Oktober", "November", "Desember"}
 	replyMarkupList = buildReplyMarkupList()
@@ -35,9 +36,9 @@ var (
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
 		Keyboard: [][]telegram.KeyboardButton{
-			{{Text: Today}, {Text: Yesterday}},
-			{{Text: ThisWeek}, {Text: PastWeek}},
-			{{Text: ThisMonth}, {Text: PastMonth}},
+			{{Text: TextToday}, {Text: TextYesterday}},
+			{{Text: TextThisWeek}, {Text: TextPastWeek}},
+			{{Text: TextThisMonth}, {Text: TextPastMonth}},
 		},
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,
@@ -53,18 +54,18 @@ func commandList(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessageCustom(msg.Chat.ID, ListText, 0, replyMarkupList)
+	_, err := sendMessageCustom(msg.Chat.ID, TextList, 0, replyMarkupList)
 	return true, err
 }
 
 func list(msg *telegram.Message) (bool, error) {
 	start, end := buildIntervalSQL(strings.ToLower(msg.Text))
-	if start == "" || end == "" {
+	if start.IsZero() || end.IsZero() {
 		return false, nil
 	}
 
-	query := fmt.Sprintf("SELECT name, price, created_at FROM items WHERE chat_id = $1 AND (%s) <= created_at AND created_at < (%s) ORDER BY created_at;", start, end)
-	items, err := execQuerySelect(query, msg.Chat.ID)
+	query := "SELECT name, price, created_at FROM items WHERE chat_id = $1 AND $2 <= created_at AND created_at < $3 ORDER BY created_at;"
+	items, err := execQuerySelect(query, msg.Chat.ID, start, end)
 	if err != nil {
 		return true, err
 	}
@@ -73,33 +74,32 @@ func list(msg *telegram.Message) (bool, error) {
 	return true, err
 }
 
-func buildIntervalSQL(interval string) (string, string) {
-	timeToday := "DATE_TRUNC('DAY', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	timeTomorrow := timeToday + " + INTERVAL '1 DAY'"
-	timeYesterday := timeToday + " - INTERVAL '1 DAY'"
-	timeBeginOfWeek := fmt.Sprintf("%s - INTERVAL '%d DAY'", timeToday, time.Now().In(time.FixedZone("Asia/Jakarta", 7*60*60)).Weekday())
-	timeBeginOfPastWeek := timeBeginOfWeek + " - INTERVAL '7 DAYS'"
-	timeBeginOfMonth := "DATE_TRUNC('MONTH', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Jakarta')"
-	timeBeginOfPastMonth := timeBeginOfMonth + " - INTERVAL '1 MONTH'"
+func buildIntervalSQL(interval string) (time.Time, time.Time) {
+	now := time.Now().In(tzWIB)
+	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzWIB).In(time.UTC)
+	tomorrow := today.AddDate(0, 0, 1)
+	beginOfWeek := today.AddDate(0, 0, int(time.Sunday-today.Weekday()))
+	beginOfMonth := today.AddDate(0, 0, 1-today.Day())
 	switch interval {
-	case Today:
-		return timeToday, timeTomorrow
-	case Yesterday:
-		return timeYesterday, timeToday
-	case ThisWeek:
-		return timeBeginOfWeek, timeTomorrow
-	case PastWeek:
-		return timeBeginOfPastWeek, timeBeginOfWeek
-	case ThisMonth:
-		return timeBeginOfMonth, timeTomorrow
-	case PastMonth:
-		return timeBeginOfPastMonth, timeBeginOfMonth
+	case TextToday:
+		return today, tomorrow
+	case TextYesterday:
+		return today.AddDate(0, 0, -1), today
+	case TextThisWeek:
+		return beginOfWeek, tomorrow
+	case TextPastWeek:
+		return beginOfWeek.AddDate(0, 0, -7), beginOfWeek
+	case TextThisMonth:
+		return beginOfMonth, tomorrow
+	case TextPastMonth:
+		return beginOfMonth.AddDate(0, -1, 0), beginOfMonth
+	default:
+		return time.Time{}, time.Time{}
 	}
-	return "", ""
 }
 
-func execQuerySelect(query string, chatID int64) ([]Item, error) {
-	rows, err := db.Query(query, chatID)
+func execQuerySelect(query string, queryParams ...interface{}) ([]Item, error) {
+	rows, err := db.Query(query, queryParams...)
 	if err != nil {
 		return nil, err
 	}
@@ -110,6 +110,7 @@ func execQuerySelect(query string, chatID int64) ([]Item, error) {
 		if err != nil {
 			return nil, err
 		}
+		item.CreatedAt = item.CreatedAt.In(tzWIB)
 		items = append(items, item)
 	}
 	return items, nil
@@ -118,11 +119,9 @@ func execQuerySelect(query string, chatID int64) ([]Item, error) {
 func formatItems(title string, items []Item) string {
 	text := fmt.Sprintf("*=== %s ===*\n", strings.ToUpper(title))
 	sum := Price(0)
-	lastDay := 0
-	for _, item := range items {
-		if day := item.CreatedAt.Day(); day != lastDay {
-			text += fmt.Sprintf("\n_%d %s_\n", day, monthNames[item.CreatedAt.Month()-1])
-			lastDay = day
+	for i, item := range items {
+		if i == 0 || item.CreatedAt.Day() != items[i-1].CreatedAt.Day() {
+			text += fmt.Sprintf("\n_%d %s_\n", item.CreatedAt.Day(), monthNames[item.CreatedAt.Month()-time.January])
 		}
 		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
 		sum += item.Price
