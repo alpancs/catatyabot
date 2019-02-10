@@ -79,7 +79,7 @@ func buildIntervalSQL(interval string) (time.Time, time.Time) {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, tzWIB).In(time.UTC)
 	tomorrow := today.AddDate(0, 0, 1)
 	beginOfWeek := today.AddDate(0, 0, int(time.Sunday-now.Weekday()))
-	beginOfMonth := today.AddDate(0, 0, 1-today.Day())
+	beginOfMonth := today.AddDate(0, 0, 1-now.Day())
 	switch interval {
 	case TextToday:
 		return today, tomorrow
