@@ -14,8 +14,11 @@ func TestParsePrice0(t *testing.T) {
 func TestParsePrice25ribu(t *testing.T) {
 	assertEqual(t, Price(25000), ParsePrice("25rb"))
 }
-func TestParsePrice1200(t *testing.T) {
+func TestParsePrice1200Comma(t *testing.T) {
 	assertEqual(t, Price(1200), ParsePrice("1,2 k"))
+}
+func TestParsePrice1200Dot(t *testing.T) {
+	assertEqual(t, Price(1200), ParsePrice("1.2 ribu"))
 }
 func TestParsePrice5000000(t *testing.T) {
 	assertEqual(t, Price(5000000), ParsePrice("5 juta"))
