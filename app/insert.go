@@ -31,41 +31,16 @@ func insert(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	lines := strings.Split(msg.Text, "\n")
-	numWorkers := len(lines)
-	if numWorkers > 5 {
-		numWorkers = 5
-	}
-	return true, insertByWorkers(numWorkers, msg, lines)
-}
-
-func insertByWorkers(numWorkers int, msg *telegram.Message, lines []string) error {
-	chanText := make(chan string)
-	chanError := make(chan error, len(lines))
-	for i := 0; i < numWorkers; i++ {
-		go worker(msg, chanText, chanError)
-	}
-	for _, text := range lines {
-		chanText <- text
-	}
-	close(chanText)
-
-	for range lines {
-		err := <-chanError
+	for _, text := range strings.Split(msg.Text, "\n") {
+		err := insertOneLine(msg, text)
 		if err != nil {
-			return err
+			return true, err
 		}
 	}
-	return nil
+	return true, nil
 }
 
-func worker(msg *telegram.Message, chanText <-chan string, chanError chan error) {
-	for text := range chanText {
-		chanError <- insertSpecificLine(msg, strings.TrimSpace(text))
-	}
-}
-
-func insertSpecificLine(msg *telegram.Message, text string) error {
+func insertOneLine(msg *telegram.Message, text string) error {
 	priceText := patternPrice.FindString(text)
 	item := strings.TrimSpace(text[:len(text)-len(priceText)])
 	if item == "" || priceText == "" {
