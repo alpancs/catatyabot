@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	forceReply = `{"force_reply":true}`
+	forceReply = `{"force_reply":true,"selective":true}`
 )
 
 func commandInsert(msg *telegram.Message) (bool, error) {
