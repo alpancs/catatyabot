@@ -22,7 +22,7 @@ func commandInsert(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, 0, forceReply)
+	_, err := sendMessageCustom(msg.Chat.ID, NewItemsText, msg.MessageID, forceReply)
 	return true, err
 }
 
