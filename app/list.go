@@ -36,9 +36,9 @@ var (
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
 		Keyboard: [][]telegram.KeyboardButton{
-			{{Text: TextToday}, {Text: TextYesterday}},
-			{{Text: TextThisWeek}, {Text: TextPastWeek}},
-			{{Text: TextThisMonth}, {Text: TextPastMonth}},
+			{{Text: TextYesterday}, {Text: TextToday}},
+			{{Text: TextPastWeek}, {Text: TextThisWeek}},
+			{{Text: TextPastMonth}, {Text: TextThisMonth}},
 		},
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,
