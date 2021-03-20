@@ -7,6 +7,10 @@ import (
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
+const (
+	UpdateTemplate = "ini sudah dicoret ya bos 👆\ndiganti sama *%s %s*"
+)
+
 func update(msg *telegram.Message) (bool, error) {
 	if msg.ReplyToMessage == nil {
 		return false, nil
@@ -32,10 +36,14 @@ func update(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	err = editMessage(msg.Chat.ID, msg.ReplyToMessage.MessageID, fmt.Sprintf(SaveTemplate, item, price))
+	err = editMessage(msg.Chat.ID, msg.ReplyToMessage.MessageID, cross(msg.ReplyToMessage.Text))
 	if err != nil {
 		return true, err
 	}
-	_, err = sendMessage(msg.Chat.ID, "sudah diubah nih bos 👆", msg.ReplyToMessage.MessageID)
+	_, err = sendMessage(msg.Chat.ID, fmt.Sprintf(UpdateTemplate, item, price), msg.ReplyToMessage.MessageID)
 	return true, err
+}
+
+func cross(text string) string {
+	return "~" + strings.Replace(text, "* dicatat", "*~ dicatat", 1)
 }
