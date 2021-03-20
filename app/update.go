@@ -45,5 +45,14 @@ func update(msg *telegram.Message) (bool, error) {
 }
 
 func cross(text string) string {
-	return strings.Replace(text, "*", "~", 2)
+	text = strings.Replace(text, "*", "~", 2)
+
+	restrictedChars := []byte{'_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'}
+	for _, c := range restrictedChars {
+		if c != '~' {
+			s := string(c)
+			text = strings.ReplaceAll(text, s, `\`+s)
+		}
+	}
+	return text
 }

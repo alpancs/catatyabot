@@ -25,7 +25,7 @@ func sendMessageCustom(chatID int64, text string, replyToMessageID int, replyMar
 	resp, err := http.PostForm(sendMessageURL, url.Values{
 		"chat_id":             {strconv.FormatInt(chatID, 10)},
 		"text":                {text},
-		"parse_mode":          {"MarkdownV2"},
+		"parse_mode":          {"Markdown"},
 		"reply_to_message_id": {strconv.Itoa(replyToMessageID)},
 		"reply_markup":        {replyMarkup},
 	})
