@@ -45,5 +45,5 @@ func update(msg *telegram.Message) (bool, error) {
 }
 
 func cross(text string) string {
-	return "~" + strings.Replace(text, "* dicatat", "*~ dicatat", 1)
+	return strings.Replace(text, "*", "~", 2)
 }
