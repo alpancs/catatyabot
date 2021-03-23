@@ -69,7 +69,7 @@ func editMessage(chatID int64, messageID int, text string) error {
 		"chat_id":    {strconv.FormatInt(chatID, 10)},
 		"message_id": {strconv.Itoa(messageID)},
 		"text":       {text},
-		"parse_mode": {"Markdown"},
+		"parse_mode": {"MarkdownV2"},
 	})
 }
 
