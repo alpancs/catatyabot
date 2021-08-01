@@ -4,7 +4,7 @@ import (
 	telegram "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-const StartMessage = `*== cara @catatyabot membantu anda ==*
+const HelpMessage = `*== cara @catatyabot membantu anda ==*
 
 1. undang @catatyabot ke grup Telegram anda, atau boleh juga langsung _chat_ ke bot 😊
 
@@ -30,6 +30,6 @@ _sofa ruang tamu 6 jt_
 selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`
 
 func help(msg *telegram.Message) error {
-	_, err := sendMessage(msg.Chat.ID, StartMessage, 0)
+	_, err := sendMessage(msg.Chat.ID, HelpMessage, 0)
 	return err
 }
