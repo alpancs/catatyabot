@@ -42,7 +42,7 @@ func TestPriceString1234567(t *testing.T) {
 
 func BenchmarkPriceString1234567(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Price(1234567).String()
+		_ = Price(1234567).String()
 	}
 	b.ReportAllocs()
 }
