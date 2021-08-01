@@ -25,16 +25,16 @@ func buildSummary(chatID int64) (string, error) {
 	chanToday := make(chan Price, 1)
 	chanYesterday := make(chan Price, 1)
 	chanThisWeek := make(chan Price, 1)
-	chanPastWeek := make(chan Price, 1)
 	chanThisMonth := make(chan Price, 1)
 	chanPastMonth := make(chan Price, 1)
+	chanAllTime := make(chan Price, 1)
 
 	go sumInterval(chatID, TextToday, chanToday, chanError)
 	go sumInterval(chatID, TextYesterday, chanYesterday, chanError)
 	go sumInterval(chatID, TextThisWeek, chanThisWeek, chanError)
-	go sumInterval(chatID, TextPastWeek, chanPastWeek, chanError)
 	go sumInterval(chatID, TextThisMonth, chanThisMonth, chanError)
 	go sumInterval(chatID, TextPastMonth, chanPastMonth, chanError)
+	go sumInterval(chatID, TextAllTime, chanAllTime, chanError)
 
 	for i := 0; i < 6; i++ {
 		if err := <-chanError; err != nil {
@@ -55,9 +55,9 @@ func buildSummary(chatID int64) (string, error) {
 		TextToday, <-chanToday,
 		TextYesterday, <-chanYesterday,
 		TextThisWeek, <-chanThisWeek,
-		TextPastWeek, <-chanPastWeek,
 		TextThisMonth, <-chanThisMonth,
 		TextPastMonth, <-chanPastMonth,
+		TextAllTime, <-chanAllTime,
 	), nil
 }
 
