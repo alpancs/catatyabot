@@ -53,7 +53,6 @@ func findOneItem(text string) (item, priceText string, err error) {
 			count++
 		}
 	}
-
 	if count > 1 {
 		err = errors.New("found multiple items")
 	}
