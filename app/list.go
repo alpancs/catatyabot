@@ -60,7 +60,7 @@ func commandList(msg *telegram.Message) (bool, error) {
 
 func list(msg *telegram.Message) (bool, error) {
 	start, end := buildIntervalSQL(strings.ToLower(msg.Text))
-	if start.IsZero() || end.IsZero() {
+	if start.IsZero() && end.IsZero() {
 		return false, nil
 	}
 
