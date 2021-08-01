@@ -22,10 +22,10 @@ satu pesan boleh berisi lebih dari satu catatan lho, dan bisa pakai satuan ribu/
 
 contoh pesannya seperti ini 👇
 
-> sayur kangkung 2500
->
-> ayam 1 kg 27k
->
-> susu 86 ribu
+```text
+sayur kangkung 2500
+ayam 1 kg 27k
+susu 86 ribu
+```
 
 selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.
