@@ -15,7 +15,7 @@ func update(msg *telegram.Message) (bool, error) {
 
 	item, priceText, err := findOneItem(msg.Text)
 	if err != nil {
-		_, err = sendMessage(msg.Chat.ID, "kalau untuk _update_ catatan .. satu-satu ya, tidak bisa beberapa catatan sekaligus 😬", 0)
+		_, err = sendMessage(msg.Chat.ID, "kalau mau ubah catatan, satu-satu ya .. tidak bisa beberapa catatan sekaligus 😬", 0)
 		return true, err
 	}
 	if item == "" || priceText == "" {
