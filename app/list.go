@@ -123,7 +123,7 @@ func formatItems(title string, items []Item) string {
 		if i == 0 || item.CreatedAt.Day() != items[i-1].CreatedAt.Day() {
 			text += fmt.Sprintf("\n_%d %s_\n", item.CreatedAt.Day(), monthNames[item.CreatedAt.Month()-time.January])
 		}
-		text += fmt.Sprintf("- %s %s\n", item.Name, item.Price)
+		text += fmt.Sprintf("[%02d:%02d] %s %s\n", item.CreatedAt.Hour(), item.CreatedAt.Minute(), item.Name, item.Price)
 		sum += item.Price
 	}
 	return fmt.Sprintf("%s\n*TOTAL: %s*", text, sum)
