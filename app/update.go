@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,8 +13,11 @@ func update(msg *telegram.Message) (bool, error) {
 		return false, nil
 	}
 
-	priceText := patternPrice.FindString(msg.Text)
-	item := strings.TrimSpace(msg.Text[:len(msg.Text)-len(priceText)])
+	item, priceText, err := findOneItem(msg.Text)
+	if err != nil {
+		_, err = sendMessage(msg.Chat.ID, "kalau mau ubah catatan, satu-satu ya .. tidak bisa beberapa catatan sekaligus 😬", 0)
+		return true, err
+	}
 	if item == "" || priceText == "" {
 		return false, nil
 	}
@@ -38,4 +42,19 @@ func update(msg *telegram.Message) (bool, error) {
 	}
 	_, err = sendMessage(msg.Chat.ID, "sudah diubah nih bos 👆", msg.ReplyToMessage.MessageID)
 	return true, err
+}
+
+func findOneItem(text string) (item, priceText string, err error) {
+	count := 0
+	for _, line := range strings.Split(text, "\n") {
+		priceText = patternPrice.FindString(line)
+		item = strings.TrimSpace(line[:len(line)-len(priceText)])
+		if item != "" && priceText != "" {
+			count++
+		}
+	}
+	if count > 1 {
+		err = errors.New("found multiple items")
+	}
+	return
 }
