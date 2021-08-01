@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -54,7 +55,7 @@ func findOneItem(text string) (item, priceText string, err error) {
 	}
 
 	if count > 1 {
-		err = *new(error)
+		err = errors.New("found multiple items")
 	}
 	return
 }
