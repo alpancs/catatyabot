@@ -29,7 +29,12 @@ _sofa ruang tamu 6 jt_
 
 selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`
 
-func help(msg *telegram.Message) error {
-	_, err := sendMessage(msg.Chat.ID, HelpMessage, 0)
-	return err
+func help(msg *telegram.Message) (processed bool, err error) {
+	cmd := msg.Command()
+	if cmd == "start" || cmd == "bantuan" {
+		_, err = sendMessage(msg.Chat.ID, HelpMessage, 0)
+		return true, err
+	}
+
+	return false, nil
 }

@@ -63,5 +63,10 @@ func respondUpdate(u *telegram.Update) error {
 	if right, err := update(msg); right {
 		return err
 	}
-	return help(msg)
+
+	if right, err := help(msg); right {
+		return err
+	}
+
+	return nil
 }
