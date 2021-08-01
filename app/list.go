@@ -20,9 +20,9 @@ const (
 	TextToday     = "hari ini"
 	TextYesterday = "kemarin"
 	TextThisWeek  = "pekan ini"
-	TextPastWeek  = "pekan lalu"
 	TextThisMonth = "bulan ini"
 	TextPastMonth = "bulan lalu"
+	TextAllTime   = "semuanya"
 )
 
 var (
@@ -36,9 +36,9 @@ var (
 func buildReplyMarkupList() string {
 	raw, err := json.Marshal(telegram.ReplyKeyboardMarkup{
 		Keyboard: [][]telegram.KeyboardButton{
-			{{Text: TextYesterday}, {Text: TextToday}},
-			{{Text: TextPastWeek}, {Text: TextThisWeek}},
-			{{Text: TextPastMonth}, {Text: TextThisMonth}},
+			{{Text: TextToday}, {Text: TextYesterday}},
+			{{Text: TextThisWeek}, {Text: TextThisMonth}},
+			{{Text: TextPastMonth}, {Text: TextAllTime}},
 		},
 		ResizeKeyboard:  true,
 		OneTimeKeyboard: true,
@@ -87,12 +87,12 @@ func buildIntervalSQL(interval string) (time.Time, time.Time) {
 		return today.AddDate(0, 0, -1), today
 	case TextThisWeek:
 		return beginOfWeek, tomorrow
-	case TextPastWeek:
-		return beginOfWeek.AddDate(0, 0, -7), beginOfWeek
 	case TextThisMonth:
 		return beginOfMonth, tomorrow
 	case TextPastMonth:
 		return beginOfMonth.AddDate(0, -1, 0), beginOfMonth
+	case TextAllTime:
+		return time.Time{}, tomorrow
 	default:
 		return time.Time{}, time.Time{}
 	}
