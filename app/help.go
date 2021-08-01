@@ -5,6 +5,7 @@ import (
 )
 
 const StartMessage = `*== cara @catatyabot membantu anda ==*
+
 1. undang @catatyabot ke grup Telegram anda, atau boleh juga langsung _chat_ ke bot 😊
 2. panggil @catatyabot menggunakan perintah berikut,
    - /catat membuat bot bersiap mencatat 📝, lalu balas dengan menuliskan satu atau beberapa catatan
