@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"catatyabot/app"
+	"github.com/alpancs/catatyabot/app"
 )
 
 func main() {
