@@ -12,7 +12,7 @@ const HelpMessage = `*== cara @catatyabot membantu anda ==*
 
     - /catat membuat bot bersiap mencatat 📝, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus
 
-    - _reply_ pesan #catatan dari bot dengan /hapus untuk menghapusnya 🗑️
+    - balas pesan #catatan dari bot dengan /hapus untuk menghapusnya 🗑️
 
     - gunakan /lihat untuk melihat daftar catatan 👀
 
@@ -25,7 +25,7 @@ _sayur kangkung 2500_
 _ayam 1 kg 27k_
 _susu 86 ribu_
 
-selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`
+selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup balas pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`
 
 func help(msg *telegram.Message) (processed bool, err error) {
 	cmd := msg.Command()

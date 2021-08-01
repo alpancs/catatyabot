@@ -10,7 +10,7 @@
 
     - `/catat` membuat bot bersiap mencatat 📝, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus
 
-    - _reply_ pesan #catatan dari bot dengan `/hapus` untuk menghapusnya 🗑️
+    - balas pesan #catatan dari bot dengan `/hapus` untuk menghapusnya 🗑️
 
     - gunakan `/lihat` untuk melihat daftar catatan 👀
 
@@ -28,4 +28,4 @@ ayam 1 kg 27k
 susu 86 ribu
 ```
 
-selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.
+selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup balas pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.
