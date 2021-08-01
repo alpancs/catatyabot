@@ -46,10 +46,8 @@ func buildSummary(chatID int64) (string, error) {
 
 - %s: %s
 - %s: %s
-
 - %s: %s
 - %s: %s
-
 - %s: %s
 - %s: %s`,
 		TextToday, <-chanToday,
