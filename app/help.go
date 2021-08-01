@@ -18,14 +18,12 @@ const HelpMessage = `*== cara @catatyabot membantu anda ==*
 
     - dan gunakan /rangkum untuk merangkum catatan selama beberapa waktu terakhir 📈📉
 
-satu pesan boleh berisi lebih dari satu catatan lho 🙂
+satu pesan boleh berisi lebih dari satu catatan lho, dan bisa pakai satuan ribu/rb/k/juta/jt juga 🙂
 contoh pesannya seperti ini 👇
 
 _sayur kangkung 2500_
 _ayam 1 kg 27k_
 _susu 86 ribu_
-_token listrik 200rb_
-_sofa ruang tamu 6 jt_
 
 selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup _reply_ pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`
 
