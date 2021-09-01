@@ -120,7 +120,7 @@ func formatItems(title string, items []Item) string {
 	text := fmt.Sprintf("*=== %s ===*\n", strings.ToUpper(title))
 	sum := Price(0)
 	for i, item := range items {
-		if i == 0 || item.CreatedAt.Day() != items[i-1].CreatedAt.Day() {
+		if i == 0 || !(item.CreatedAt.Day() == items[i-1].CreatedAt.Day() && item.CreatedAt.Month() == items[i-1].CreatedAt.Month() && item.CreatedAt.Year() == items[i-1].CreatedAt.Year()) {
 			text += fmt.Sprintf("\n%d %s %d\n", item.CreatedAt.Day(), monthNames[item.CreatedAt.Month()-time.January], item.CreatedAt.Year())
 		}
 		text += fmt.Sprintf("%02d:%02d - %s %s\n", item.CreatedAt.Hour(), item.CreatedAt.Minute(), item.Name, item.Price)
