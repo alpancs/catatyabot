@@ -33,6 +33,10 @@ func TestPriceString0(t *testing.T) {
 func TestPriceString12(t *testing.T) {
 	assertEqual(t, "12", Price(12).String())
 }
+func TestPriceString999(t *testing.T) {
+	assertEqual(t, "999", Price(999).String())
+}
+
 func TestPriceString2500(t *testing.T) {
 	assertEqual(t, "2.500", Price(2500).String())
 }
