@@ -40,6 +40,14 @@ func TestPriceString1234567(t *testing.T) {
 	assertEqual(t, "1.234.567", Price(1234567).String())
 }
 
+func TestPriceStringNeg999(t *testing.T) {
+	assertEqual(t, "-999", Price(-999).String())
+}
+
+func TestPriceStringNeg123000(t *testing.T) {
+	assertEqual(t, "-123.000", Price(-123000).String())
+}
+
 func BenchmarkPriceString1234567(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = Price(1234567).String()
