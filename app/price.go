@@ -9,8 +9,8 @@ import (
 type Price int64
 
 var (
-	patternPrice    = regexp.MustCompile(` \d+([,.]\d+)?( *(ribu|rb|k|juta|jt))?$`)
-	patternNumber   = regexp.MustCompile(`\d+([,.]\d+)?`)
+	patternPrice    = regexp.MustCompile(` -?\d+([,.]\d+)?( *(ribu|rb|k|juta|jt))?$`)
+	patternNumber   = regexp.MustCompile(`-?\d+([,.]\d+)?`)
 	patternThousand = regexp.MustCompile(`ribu|rb|k`)
 	patternMillion  = regexp.MustCompile(`juta|jt`)
 )
@@ -31,7 +31,7 @@ func (p Price) String() string {
 	return separate(strconv.FormatInt(int64(p), 10))
 }
 func separate(s string) string {
-	if len(s) <= 3 {
+	if (s[0] == '-' && len(s) <= 4) || len(s) <= 3 {
 		return s
 	}
 	return separate(s[:len(s)-3]) + "." + s[len(s)-3:]
