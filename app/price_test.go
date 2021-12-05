@@ -44,6 +44,10 @@ func TestPriceStringNeg999(t *testing.T) {
 	assertEqual(t, "-999", Price(-999).String())
 }
 
+func TestPriceStringNeg1000(t *testing.T) {
+	assertEqual(t, "-1.000", Price(-1000).String())
+}
+
 func TestPriceStringNeg123000(t *testing.T) {
 	assertEqual(t, "-123.000", Price(-123000).String())
 }
