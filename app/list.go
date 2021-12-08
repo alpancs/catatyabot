@@ -59,7 +59,7 @@ func commandList(msg *telegram.Message) (bool, error) {
 }
 
 func list(msg *telegram.Message) (bool, error) {
-	if msg.ReplyToMessage.Text != TextList {
+	if msg.ReplyToMessage == nil || msg.ReplyToMessage.Text != TextList {
 		return false, nil
 	}
 
