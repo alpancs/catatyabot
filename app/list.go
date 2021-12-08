@@ -59,6 +59,10 @@ func commandList(msg *telegram.Message) (bool, error) {
 }
 
 func list(msg *telegram.Message) (bool, error) {
+	if msg.ReplyToMessage.Text != TextList {
+		return false, nil
+	}
+
 	start, end := buildIntervalSQL(strings.ToLower(msg.Text))
 	if start.IsZero() && end.IsZero() {
 		return false, nil
