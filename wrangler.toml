@@ -1,5 +1,5 @@
 name = "catatyabot"
-main = "src/worker.ts"
+main = "src/index.ts"
 compatibility_date = "2023-06-06"
 
 [[d1_databases]]

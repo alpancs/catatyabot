@@ -1,7 +1,4 @@
-export interface Env {
-	DB: D1Database;
-	TELEGRAM_TOKEN: string;
-}
+import { Env } from "./env"
 
 export default {
 	async fetch(request: Request, env: Env) {
