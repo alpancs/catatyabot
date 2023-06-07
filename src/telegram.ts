@@ -17,12 +17,16 @@ interface Chat {
 }
 
 export async function getUpdateResponse(update: Update, env: Env) {
+    return update.message ? getMessageResponse(update.message, env) : new Response(null);
+}
+
+async function getMessageResponse(message: Message, env: Env) {
     await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            chat_id: update.message?.chat.id,
-            text: `your message was "${update.message?.text}", right?`,
+            chat_id: message.chat.id,
+            text: `your message was "${message.text}", right?`,
         }),
     });
     return new Response(null);
