@@ -1,3 +1,8 @@
 name = "catatyabot"
 main = "src/worker.ts"
 compatibility_date = "2023-06-06"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "catatyabot"
+database_id = "a701ce64-f2c2-4064-9c48-00c8b0476528"
