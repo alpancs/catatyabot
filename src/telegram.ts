@@ -17,10 +17,11 @@ interface Chat {
 }
 
 export async function getUpdateResponse(update: Update, env: Env) {
-    return update.message ? getMessageResponse(update.message, env) : new Response(null);
+    if (update.message) await respondMessage(update.message, env);
+    return new Response(null);
 }
 
-async function getMessageResponse(message: Message, env: Env) {
+async function respondMessage(message: Message, env: Env) {
     await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,5 +30,4 @@ async function getMessageResponse(message: Message, env: Env) {
             text: `your message was "${message.text}", right?`,
         }),
     });
-    return new Response(null);
 }
