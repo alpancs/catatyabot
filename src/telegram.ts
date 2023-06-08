@@ -8,7 +8,7 @@ export async function getUpdateResponse(update: Update, env: Env) {
 
 async function respondMessage(message: Message, env: Env) {
     if (message.text === "/semua") return respondListAll(message, env);
-    console.debug(JSON.stringify({ status: "ignored", message }));
+    console.info(JSON.stringify({ status: "ignored", message }));
 }
 
 async function respondListAll(message: Message, env: Env) {
