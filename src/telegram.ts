@@ -10,7 +10,7 @@ async function respondMessage(message: Message, env: Env) {
     if (message.text === "/semua") {
         return respondListAll(message, env);
     }
-    return sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, `your message was "${message.text}", right?`);
+    console.debug(JSON.stringify({ status: "ignored", message }));
 }
 
 async function respondListAll(message: Message, env: Env) {
