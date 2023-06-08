@@ -22,12 +22,21 @@ export async function getUpdateResponse(update: Update, env: Env) {
 }
 
 async function respondMessage(message: Message, env: Env) {
-    await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    if (message.text === "/semua") {
+        return respondListAll(message, env);
+    }
+    return sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, `your message was "${message.text}", right?`);
+}
+
+async function respondListAll(message: Message, env: Env) {
+    const { results } = await env.DB.prepare("SELECT * FROM items WHERE chat_id = ?").bind(message.chat.id).all();
+    return sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, "```json\n" + JSON.stringify(results) + "\n```");
+}
+
+async function sendMessage(botToken: string, chatId: number, text: string) {
+    return fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: message.chat.id,
-            text: `your message was "${message.text}", right?`,
-        }),
+        body: JSON.stringify({ chat_id: chatId, text: text, parse_mode: "MarkdownV2" }),
     });
 }
