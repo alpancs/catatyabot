@@ -1,5 +1,6 @@
-import { Env } from "./env";
-import { Update, getUpdateResponse } from "./telegram";
+import { Env } from "./env.d";
+import { Update } from "./telegram.d";
+import { getUpdateResponse } from "./telegram";
 
 export default {
 	async fetch(request: Request, env: Env) {
