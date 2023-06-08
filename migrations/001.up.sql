@@ -4,6 +4,5 @@ CREATE TABLE IF NOT EXISTS items (
     name TEXT NOT NULL,
     price REAL NOT NULL,
     created_at TEXT NOT NULL,
-    updated_at TEXT,
     PRIMARY KEY (chat_id, message_id)
 );
