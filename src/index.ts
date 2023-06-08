@@ -1,4 +1,4 @@
-import { Env } from "./env.d";
+import { Env } from "./common.d";
 import { Update } from "./telegram.d";
 import { getUpdateResponse } from "./telegram";
 
