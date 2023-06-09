@@ -1,4 +1,4 @@
-import { Env } from "./common.d";
+import { Env } from "./env.d";
 import { Update } from "./telegram.d";
 import { getUpdateResponse } from "./telegram";
 
@@ -8,15 +8,15 @@ export default {
 		if (request.method == "POST" && pathname == "/webhook/telegram") {
 			return this.handleRequestWebhookTelegram(request, env);
 		}
-		return new Response(null, { status: 404 });
+		return new Response(undefined, { status: 404 });
 	},
 
 	async handleRequestWebhookTelegram(request: Request, env: Env) {
 		if (!request.headers.has("X-Telegram-Bot-Api-Secret-Token")) {
-			return new Response(null, { status: 401 });
+			return new Response(undefined, { status: 401 });
 		}
 		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") != env.TELEGRAM_BOT_TOKEN) {
-			return new Response(null, { status: 403 });
+			return new Response(undefined, { status: 403 });
 		}
 		let update: Update;
 		try {
