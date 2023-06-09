@@ -20,5 +20,8 @@ _sayur kangkung 2500_
 _ayam 1 kg 27k_
 _susu 86 ribu_
 
-selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup balas pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.`);
+selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup balas pesan #catatan yang ingin diubah dengan nama & harga barang yang baru.
+
+
+_ℹ️ saat ini bot sedang dalam fase pengembangan ulang dan belum berfungsi normal_`);
 }
