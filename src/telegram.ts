@@ -1,8 +1,4 @@
-import { Env } from "./env.d";
-import { Item } from "./item.d";
-import { Update, Message } from "./telegram.d";
-
-type SendTextFn = (text: string) => Promise<Response>;
+import { sendHelpMessage } from "./help";
 
 export async function getUpdateResponse(update: Update, env: Env) {
     if (update.message) await respondMessage(update.message, env);
@@ -10,24 +6,34 @@ export async function getUpdateResponse(update: Update, env: Env) {
 }
 
 async function respondMessage(message: Message, env: Env) {
-    if (message.text === "/semua") return respondListAll(message, env);
+    const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
+    const reply = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id);
+    if (message.text === "/start" || message.text === "/bantuan") return sendHelpMessage(send);
+    // dummy
+    if (message.text === "/semua") return respondListAll(reply, message.chat.id, env.DB);
     console.info(JSON.stringify({ status: "ignored", message }));
 }
 
-async function respondListAll(message: Message, env: Env) {
-    const { results } = await env.DB.prepare("SELECT * FROM items WHERE chat_id = ?").bind(message.chat.id).all<Item>();
-    const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
-    if (results?.length) return sendItemList(send, "*=== DAFTAR SEMUANYA ===*", results);
-    return send("_catatan masih kosong_");
+// dummy
+async function respondListAll(reply: SendTextFn, chatId: number, db: D1Database) {
+    const { results } = await db.prepare("SELECT * FROM items WHERE chat_id = ?").bind(chatId).all<Item>();
+    if (results?.length) {
+        const title = "*=== DAFTAR SEMUANYA ===*";
+        const text = `${title}\n\n` + results.map(i => `[${i.created_at.slice(0, 16)}] ${i.name}: ${i.price}`).join("\n");
+        return reply(text);
+    }
+    return reply("_catatan masih kosong_");
 }
 
-async function sendItemList(send: SendTextFn, title: string, items: Item[]) {
-    const text = `${title}\n\n` + items.map(i => `[${i.created_at.slice(0, 16)}] ${i.name}: ${i.price}`).join("\n");
-    return send(text);
-}
-
+let problematicChars = ['=', '.', '-', '#', '(', ')'];
 async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number) {
-    text = text.replace(/(=|-|\.)/g, "\\$1");
+    for (const problem of problematicChars) {
+        text = text.replaceAll(problem, `\\${problem}`);
+    }
+    return sendCleanMessage(botToken, chatId, text, replyToMessageId);
+}
+
+async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number) {
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -38,6 +44,17 @@ async function sendMessage(botToken: string, chatId: number, text: string, reply
             parse_mode: "MarkdownV2",
         }),
     });
-    if (response.status >= 400) console.error(await response.clone().text());
+    if (response.status >= 400) {
+        const responseText = await response.text();
+        console.error(responseText);
+        if (response.status < 500) {
+            const needToEscapePattern = /.*Character '(.)' is reserved and must be escaped.*/;
+            if (needToEscapePattern.test(responseText)) {
+                const problem = responseText.replace(needToEscapePattern, "$1");
+                problematicChars.push(problem);
+                return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId);
+            }
+        }
+    }
     return response;
 }
