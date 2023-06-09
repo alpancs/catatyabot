@@ -4,6 +4,7 @@ declare global {
     interface Env {
         DB: D1Database;
         TELEGRAM_BOT_TOKEN: string;
+        TELEGRAM_WEBHOOK_SECRET_TOKEN: string;
     }
 
     type SendTextFn = (text: string) => Promise<Response>;

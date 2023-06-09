@@ -13,7 +13,7 @@ export default {
 		if (!request.headers.has("X-Telegram-Bot-Api-Secret-Token")) {
 			return new Response(undefined, { status: 401 });
 		}
-		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") != env.TELEGRAM_BOT_TOKEN) {
+		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") != env.TELEGRAM_WEBHOOK_SECRET_TOKEN) {
 			return new Response(undefined, { status: 403 });
 		}
 		let update: Update;
