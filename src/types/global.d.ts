@@ -7,7 +7,8 @@ declare global {
         TELEGRAM_WEBHOOK_SECRET_TOKEN: string;
     }
 
-    type SendTextFn = (text: string) => Promise<void>;
+    type SendTextFn = (text: string) => Promise<Response>;
+    type EditTextFn = (messageId: number, text: string) => Promise<Response>;
 
     interface Item {
         chat_id: number;

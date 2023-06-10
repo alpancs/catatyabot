@@ -2,14 +2,18 @@ const allEscapeeChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', 
 const userInputEscapeeChars = ['*', '_', '~'];
 let generalEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
 
-export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
+function escapeGeneral(text: string) {
     for (const c of generalEscapeeChars) text = text.replaceAll(c, `\\${c}`);
-    return sendCleanMessage(botToken, chatId, text, replyToMessageId, forceReply);
+    return text;
 }
 
 export function escapeUserInput(text: string) {
     for (const c of userInputEscapeeChars) text = text.replaceAll(c, `\\${c}`);
     return text;
+}
+
+export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
+    return sendCleanMessage(botToken, chatId, escapeGeneral(text), replyToMessageId, forceReply);
 }
 
 async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
@@ -29,13 +33,27 @@ async function sendCleanMessage(botToken: string, chatId: number, text: string, 
     });
     if (response.status >= 400) {
         const responseText = await response.text();
-        const needToEscapePattern = /.*Character '(.)' is reserved and must be escaped.*/;
-        if (needToEscapePattern.test(responseText)) {
+        const match = responseText.match(/.*Character '(?<problem>.)' is reserved and must be escaped.*/);
+        if (match) {
             console.warn(responseText);
-            const problem = responseText.replace(needToEscapePattern, "$1");
+            const problem = match.groups?.problem!;
             generalEscapeeChars.push(problem);
             return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId, forceReply);
         }
-        throw responseText;
+        throw new Error(responseText);
     }
+    return response;
+}
+
+export async function editMessage(botToken: string, chatId: number, messageId: number, text: string) {
+    return fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            chat_id: chatId,
+            message_id: messageId,
+            text: escapeGeneral(text),
+            parse_mode: "MarkdownV2",
+        }),
+    });
 }
