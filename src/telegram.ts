@@ -14,10 +14,9 @@ async function respondMessage(message: Message, env: Env) {
     const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id, true);
     if (message.text === "/start" || message.text === "/bantuan") return sendHelpMessage(send);
     if (message.text === "/catat") return askToCreateItems(ask);
-    if (message.reply_to_message?.text === createItemsQuestion && message.text) return replyForItemsCreation(reply, message.text);
-
     // dummy
     if (message.text === "/semua") return respondListAll(reply, message.chat.id, env.DB);
+    if (message.reply_to_message?.text === createItemsQuestion && message.text) return replyForItemsCreation(reply, message.text);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
 }
 
