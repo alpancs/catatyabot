@@ -23,7 +23,7 @@ async function respondMessage(message: Message, env: Env) {
 
 // dummy
 async function respondListAll(reply: SendTextFn, chatId: number, db: D1Database) {
-    const { results } = await db.prepare("SELECT * FROM items WHERE chat_id = ?").bind(chatId).all<Item>();
+    const { results } = await db.prepare("SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ?").bind(chatId).all<Item>();
     if (results?.length) {
         const title = "*=== DAFTAR SEMUANYA ===*";
         const text = `${title}\n\n` + results.map(i => `[${i.created_at.slice(0, 16)}] ${i.name}: ${i.price}`).join("\n");
