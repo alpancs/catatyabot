@@ -18,7 +18,6 @@ declare global {
     }
 
     interface Update {
-        update_id: number;
         message?: Message;
     }
 

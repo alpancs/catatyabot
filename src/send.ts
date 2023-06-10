@@ -1,10 +1,15 @@
-let problematicChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+const allEscapeeChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+const userInputEscapeeChars = ['*', '_', '~'];
+let generalEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
 
 export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
-    for (const problem of problematicChars) {
-        text = text.replaceAll(problem, `\\${problem}`);
-    }
+    for (const c of generalEscapeeChars) text = text.replaceAll(c, `\\${c}`);
     return sendCleanMessage(botToken, chatId, text, replyToMessageId, forceReply);
+}
+
+export function escapeUserInput(text: string) {
+    for (const c of userInputEscapeeChars) text = text.replaceAll(c, `\\${c}`);
+    return text;
 }
 
 async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
@@ -24,14 +29,13 @@ async function sendCleanMessage(botToken: string, chatId: number, text: string, 
     });
     if (response.status >= 400) {
         const responseText = await response.text();
-        console.error(responseText);
-        if (response.status < 500) {
-            const needToEscapePattern = /.*Character '(.)' is reserved and must be escaped.*/;
-            if (needToEscapePattern.test(responseText)) {
-                const problem = responseText.replace(needToEscapePattern, "$1");
-                problematicChars.push(problem);
-                return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId, forceReply);
-            }
+        const needToEscapePattern = /.*Character '(.)' is reserved and must be escaped.*/;
+        if (needToEscapePattern.test(responseText)) {
+            console.warn(responseText);
+            const problem = responseText.replace(needToEscapePattern, "$1");
+            generalEscapeeChars.push(problem);
+            return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId, forceReply);
         }
+        throw responseText;
     }
 }

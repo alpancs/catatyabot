@@ -1,5 +1,11 @@
-export const askForNewItemsText = "apa saja yang mau dicatat?";
+import { escapeUserInput } from "./send";
 
-export async function askForNewItems(ask: SendTextFn) {
-    return ask(askForNewItemsText);
+export const createItemsQuestion = "apa saja yang mau dicatat?";
+
+export async function askToCreateItems(ask: SendTextFn) {
+    return ask(createItemsQuestion);
+}
+
+export async function replyForItemsCreation(reply: SendTextFn, text: string) {
+    return reply(escapeUserInput(text));
 }
