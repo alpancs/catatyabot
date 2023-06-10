@@ -1,4 +1,6 @@
+import { askForNewItems } from "./create";
 import { sendHelpMessage } from "./help";
+import { sendMessage } from "./send";
 
 export async function getUpdateResponse(update: Update, env: Env) {
     if (update.message) await respondMessage(update.message, env);
@@ -8,7 +10,10 @@ export async function getUpdateResponse(update: Update, env: Env) {
 async function respondMessage(message: Message, env: Env) {
     const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
     const reply = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id);
+    const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id, true);
     if (message.text === "/start" || message.text === "/bantuan") return sendHelpMessage(send);
+    if (message.text === "/catat") return askForNewItems(ask);
+
     // dummy
     if (message.text === "/semua") return respondListAll(reply, message.chat.id, env.DB);
     console.info(JSON.stringify({ status: "ignored", message }));
@@ -23,38 +28,4 @@ async function respondListAll(reply: SendTextFn, chatId: number, db: D1Database)
         return reply(text);
     }
     return reply("_catatan masih kosong_");
-}
-
-let problematicChars = ['=', '.', '-', '#', '(', ')'];
-async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number) {
-    for (const problem of problematicChars) {
-        text = text.replaceAll(problem, `\\${problem}`);
-    }
-    return sendCleanMessage(botToken, chatId, text, replyToMessageId);
-}
-
-async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number) {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: chatId,
-            reply_to_message_id: replyToMessageId,
-            text: text,
-            parse_mode: "MarkdownV2",
-        }),
-    });
-    if (response.status >= 400) {
-        const responseText = await response.text();
-        console.error(responseText);
-        if (response.status < 500) {
-            const needToEscapePattern = /.*Character '(.)' is reserved and must be escaped.*/;
-            if (needToEscapePattern.test(responseText)) {
-                const problem = responseText.replace(needToEscapePattern, "$1");
-                problematicChars.push(problem);
-                return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId);
-            }
-        }
-    }
-    return response;
 }
