@@ -35,7 +35,7 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
 
 function parse(groups: { [key: string]: string; }) {
     let price = parseInt(groups.price!);
-    const unit = groups.unit;
+    const unit = groups.unit.toLowerCase();
     if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
     else if (unit === 'juta' || unit === 'jt') price *= 1000000;
     return { name: groups.name!, price };
