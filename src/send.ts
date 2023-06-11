@@ -1,19 +1,19 @@
 const allEscapeeChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
 const userInputEscapeeChars = ['*', '_', '~'];
-let generalEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
-
-function escapeGeneral(text: string) {
-    for (const c of generalEscapeeChars) text = text.replaceAll(c, `\\${c}`);
-    return text;
-}
+let nonUserInputEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
 
 export function escapeUserInput(text: string) {
     for (const c of userInputEscapeeChars) text = text.replaceAll(c, `\\${c}`);
     return text;
 }
 
+function escapeNonUserInput(text: string) {
+    for (const c of nonUserInputEscapeeChars) text = text.replaceAll(c, `\\${c}`);
+    return text;
+}
+
 export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
-    return sendCleanMessage(botToken, chatId, escapeGeneral(text), replyToMessageId, forceReply);
+    return sendCleanMessage(botToken, chatId, escapeNonUserInput(text), replyToMessageId, forceReply);
 }
 
 async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
@@ -37,7 +37,7 @@ async function sendCleanMessage(botToken: string, chatId: number, text: string, 
         if (match) {
             console.warn(responseText);
             const problem = match.groups?.problem!;
-            generalEscapeeChars.push(problem);
+            nonUserInputEscapeeChars.push(problem);
             return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId, forceReply);
         }
         throw new Error(responseText);
@@ -52,7 +52,7 @@ export async function editMessage(botToken: string, chatId: number, messageId: n
         body: JSON.stringify({
             chat_id: chatId,
             message_id: messageId,
-            text: escapeGeneral(text),
+            text: escapeNonUserInput(text),
             parse_mode: "MarkdownV2",
         }),
     });
