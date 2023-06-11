@@ -27,12 +27,12 @@ export async function sendMessage(botToken: string, chatId: number, text: string
             },
         }),
     });
-    if (response.status >= 400) throw new Error(await response.text());
+    if (!response.ok) throw new Error(await response.text());
     return response;
 }
 
 export async function editMessage(botToken: string, chatId: number, messageId: number, text: string) {
-    return fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+    const response = await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -42,4 +42,6 @@ export async function editMessage(botToken: string, chatId: number, messageId: n
             parse_mode: "MarkdownV2",
         }),
     });
+    if (!response.ok) throw new Error(await response.text());
+    return response;
 }
