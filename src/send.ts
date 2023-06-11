@@ -1,6 +1,6 @@
 const allEscapeeChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
 const userInputEscapeeChars = ['*', '_', '~'];
-let nonUserInputEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
+const nonUserInputEscapeeChars = allEscapeeChars.filter(c => !userInputEscapeeChars.includes(c));
 
 export function escapeUserInput(text: string) {
     for (const c of userInputEscapeeChars) text = text.replaceAll(c, `\\${c}`);
@@ -13,17 +13,13 @@ function escapeNonUserInput(text: string) {
 }
 
 export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
-    return sendCleanMessage(botToken, chatId, escapeNonUserInput(text), replyToMessageId, forceReply);
-}
-
-async function sendCleanMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             chat_id: chatId,
             reply_to_message_id: replyToMessageId,
-            text: text,
+            text: escapeNonUserInput(text),
             parse_mode: "MarkdownV2",
             reply_markup: {
                 force_reply: forceReply,
@@ -31,17 +27,7 @@ async function sendCleanMessage(botToken: string, chatId: number, text: string, 
             },
         }),
     });
-    if (response.status >= 400) {
-        const responseText = await response.text();
-        const match = responseText.match(/.*Character '(?<problem>.)' is reserved and must be escaped.*/);
-        if (match) {
-            console.warn(responseText);
-            const problem = match.groups?.problem!;
-            nonUserInputEscapeeChars.push(problem);
-            return sendCleanMessage(botToken, chatId, text.replaceAll(problem, `\\${problem}`), replyToMessageId, forceReply);
-        }
-        throw new Error(responseText);
-    }
+    if (response.status >= 400) throw new Error(await response.text());
     return response;
 }
 
