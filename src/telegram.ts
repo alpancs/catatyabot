@@ -1,4 +1,5 @@
 import { askToCreateItems, createItemsQuestion, replyForItemsCreation } from "./create";
+import { readItemsQuestion, replyForReadItems } from "./list";
 import { sendHelpMessage } from "./help";
 import { editMessage, sendMessage } from "./send";
 
@@ -15,19 +16,10 @@ async function respondMessage(message: Message, env: Env) {
     const edit = (messageId: number, text: string) => editMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, messageId, text);
     if (message.text === "/start" || message.text === "/bantuan") return sendHelpMessage(send);
     if (message.text === "/catat") return askToCreateItems(ask);
-    // dummy
-    if (message.text === "/semua") return respondListAll(reply, message.chat.id, env.DB);
-    if (message.reply_to_message?.text === createItemsQuestion && message.text) return replyForItemsCreation(reply, edit, message.text, env.DB);
+    if (message.text === "/lihat") return reply(readItemsQuestion);
+    if (message.reply_to_message?.text === createItemsQuestion && message.text)
+        return replyForItemsCreation(reply, edit, message.text, env.DB);
+    if (message.reply_to_message?.text === readItemsQuestion && message.text)
+        return replyForReadItems(reply, message.chat.id, message.text, env.DB);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
-}
-
-// dummy
-async function respondListAll(reply: SendTextFn, chatId: number, db: D1Database) {
-    const { results } = await db.prepare("SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ?").bind(chatId).all<Item>();
-    if (results?.length) {
-        const title = "*=== DAFTAR SEMUANYA ===*";
-        const text = `${title}\n\n` + results.map(i => `[${i.created_at.slice(0, 16)}] ${i.name}: ${i.price}`).join("\n");
-        return reply(text);
-    }
-    return reply("_catatan masih kosong_");
 }

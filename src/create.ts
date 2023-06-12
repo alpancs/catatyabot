@@ -25,8 +25,8 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
         await db.prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?1, ?2, ?3, ?4, datetime('now'));")
             .bind(result.chat.id, result.message_id, name, price).run();
     } catch (error: any) {
-        await edit(result.message_id, `*${escapeUserInput(name)}* *${price}* gagal dicatat ❌`);
         console.error({ message: error.message, cause: error.cause.message });
+        await edit(result.message_id, `*${escapeUserInput(name)}* *${price}* gagal dicatat ❌`);
     }
 }
 
