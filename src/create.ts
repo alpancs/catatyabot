@@ -22,14 +22,11 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
     const { result } = await replyResponse.json<{ result: Message }>();
 
     try {
-        const { success, error } = await db
-            .prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?, ?, ?, ?, datetime('now'));")
+        await db.prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?1, ?2, ?3, ?4, datetime('now'));")
             .bind(result.chat.id, result.message_id, name, price).run();
-        if (!success) throw error;
-    }
-    catch (error: any) {
+    } catch (error: any) {
         await edit(result.message_id, `*${escapeUserInput(name)}* *${price}* gagal dicatat ❌`);
-        console.error(error);
+        console.error({ message: error.message, cause: error.cause.message });
     }
 }
 
