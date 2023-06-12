@@ -1,11 +1,7 @@
 import { escapeUserInput } from "./send";
 
 export const createItemsQuestion = "apa saja yang mau dicatat?";
-const itemPattern = /^\s*(?<name>.+)\s+(?<price>-?\d+)\s*(?<unit>ribu|rb|k|juta|jt)?\s*$/i;
-
-export async function askToCreateItems(ask: SendTextFn) {
-    return ask(createItemsQuestion);
-}
+const answerPattern = /^\s*(.+)\s+(-?\d+)\s*(ribu|rb|k|juta|jt)?\s*$/i;
 
 export async function replyForItemsCreation(reply: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const line of text.split("\n")) {
@@ -14,10 +10,10 @@ export async function replyForItemsCreation(reply: SendTextFn, edit: EditTextFn,
 }
 
 async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
-    const match = text.match(itemPattern);
-    if (!match) return reply(`⚠️ "${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya/tidak ada namanya.`);
+    const match = text.match(answerPattern);
+    if (!match) return reply(`"${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya 🤷‍♂️`);
 
-    const { name, price } = parse(match.groups!)
+    const { name, price } = parse(match)
     const replyResponse = await reply(`*${escapeUserInput(name)}* *${price}* dicatat ✅`);
     const { result } = await replyResponse.json<{ result: Message }>();
 
@@ -30,10 +26,10 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
     }
 }
 
-function parse(groups: { [key: string]: string | undefined }) {
-    let price = parseInt(groups.price!);
-    const unit = groups.unit?.toLowerCase();
+function parse(match: RegExpMatchArray) {
+    let price = parseInt(match[2]);
+    const unit = match[3]?.toLowerCase();
     if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
     else if (unit === 'juta' || unit === 'jt') price *= 1000000;
-    return { name: groups.name!, price };
+    return { name: match[1], price };
 }

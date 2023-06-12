@@ -1,11 +1,11 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(\d+)\s*(hari)?\s*(y(an)?g)?\s*(lalu)?.*$/i;
+const answerPattern = /^\s*(\d+)\s*(hari)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/i;
 
-export async function replyForReadItems(reply: SendTextFn, chatId: number, text: string, db: D1Database) {
+export async function replyForReadItems(reply: SendTextFn, ask: SendTextFn, chatId: number, text: string, db: D1Database) {
     const match = text.match(answerPattern);
-    if (!match) return reply(readItemsQuestion);
+    if (!match) return ask(readItemsQuestion);
 
     try {
         const { results } = await db
@@ -25,9 +25,9 @@ async function replyWithItems(reply: SendTextFn, items?: Item[]) {
     for (const item of items) {
         if (!item.created_at.startsWith(lastCreationDate)) {
             lastCreationDate = item.created_at.substring(0, 10);
-            text += `\n\n__${lastCreationDate}__`;
+            text += `\n\n__${escapeUserInput(lastCreationDate)}__`;
         }
-        text += `\n${item.created_at.substring(11, 16)} ${escapeUserInput(item.name)} ${escapeUserInput(thousandSeparated(item.price))}`;
+        text += escapeUserInput(`\n${item.created_at.substring(11, 16)} ${item.name} ${thousandSeparated(item.price)}`);
     }
     return reply(text);
 }
