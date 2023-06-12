@@ -16,7 +16,7 @@ async function respondMessage(message: Message, env: Env) {
     const edit = (messageId: number, text: string) => editMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, messageId, text);
     if (message.text === "/start" || message.text === "/bantuan") return sendHelpMessage(send);
     if (message.text === "/catat") return askToCreateItems(ask);
-    if (message.text === "/lihat") return reply(readItemsQuestion);
+    if (message.text === "/lihat") return ask(readItemsQuestion);
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(reply, edit, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
