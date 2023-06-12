@@ -25,17 +25,17 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
         const { success, error } = await db
             .prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?, ?, ?, ?, datetime('now'));")
             .bind(result.chat.id, result.message_id, name, price).run();
-        if (!success) throw new Error(error);
+        if (!success) throw error;
     }
     catch (error: any) {
         await edit(result.message_id, `*${escapeUserInput(name)}* *${price}* gagal dicatat ❌`);
-        throw error;
+        console.error(error);
     }
 }
 
-function parse(groups: { [key: string]: string; }) {
+function parse(groups: { [key: string]: string | undefined }) {
     let price = parseInt(groups.price!);
-    const unit = groups.unit.toLowerCase();
+    const unit = groups.unit?.toLowerCase();
     if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
     else if (unit === 'juta' || unit === 'jt') price *= 1000000;
     return { name: groups.name!, price };
