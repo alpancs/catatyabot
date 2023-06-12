@@ -1,7 +1,7 @@
 import { escapeUserInput } from "./send";
 
 export const createItemsQuestion = "apa saja yang mau dicatat?";
-const answerPattern = /^\s*(.+)\s+(-?\d+)\s*(ribu|rb|k|juta|jt)?\s*$/i;
+const answerPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
 
 export async function replyForItemsCreation(reply: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const line of text.split("\n")) {
@@ -27,7 +27,7 @@ async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: s
 }
 
 function parse(match: RegExpMatchArray) {
-    let price = parseInt(match[2]);
+    let price = parseFloat(match[2].replace(",", "."));
     const unit = match[3]?.toLowerCase();
     if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
     else if (unit === 'juta' || unit === 'jt') price *= 1000000;
