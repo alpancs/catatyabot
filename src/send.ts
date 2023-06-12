@@ -21,10 +21,7 @@ export async function sendMessage(botToken: string, chatId: number, text: string
             reply_to_message_id: replyToMessageId,
             text: escapeNonUserInput(text),
             parse_mode: "MarkdownV2",
-            reply_markup: {
-                force_reply: forceReply,
-                selective: true,
-            },
+            reply_markup: forceReply ? { force_reply: true, selective: true } : undefined,
         }),
     });
     if (!response.ok) throw new Error(await response.text());
