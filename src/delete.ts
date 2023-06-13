@@ -1,7 +1,8 @@
 import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
-export const noItemToDelete = "mau hapus pesan yang mana? balas pesan bot 👆 yang berisi catatan pakai perintah /hapus";
+export const noItemToDelete = `mau hapus pesan yang mana?
+_\\*cara hapus suatu catatan: balas pesan bot yang ada tanda ✅nya pakai perintah /hapus_`;
 
 export async function replyForItemDeletion(send: SendTextFn, edit: EditTextFn, chatId: number, replyToMessageId: number, db: D1Database) {
     try {
