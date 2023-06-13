@@ -1,5 +1,5 @@
 import { escapeUserInput } from "./send";
-import { answerPattern } from "./create";
+import { answerPattern as itemPattern } from "./create";
 
 export const noItemToDelete = "mau hapus pesan yang mana? balas pesan bot 👆 yang berisi catatan pakai perintah /hapus";
 
@@ -12,6 +12,10 @@ export async function replyForItemDeletion(send: SendTextFn, edit: EditTextFn, c
         return send(`"${escapeUserInput(replyToMessageText)}" ga bisa dihapus 😵`);
     }
 
-    try { await edit(replyToMessageId, `~${escapeUserInput(replyToMessageText)}~`); } catch (error: any) { console.error(error); }
-    return send(`${escapeUserInput(replyToMessageText.match(answerPattern)![0])} sudah dihapus 🚮`);
+    try {
+        await edit(replyToMessageId, `~${escapeUserInput(replyToMessageText)}~`);
+    } catch (error: any) {
+        console.error({ replyToMessageId, replyToMessageText, error });
+    }
+    return send(`${escapeUserInput(replyToMessageText)} sudah dihapus 🚮`);
 }
