@@ -50,7 +50,7 @@ function idFormatted(date: string) {
     return `${parseInt(date.substring(8, 10))} ${months[parseInt(date.substring(5, 7)) - 1]} ${date.substring(0, 4)}`
 }
 
-function thousandSeparated(n: number): string {
+export function thousandSeparated(n: number): string {
     if (n < 0) return `-${thousandSeparated(-n)}`;
     if (n < 1000) return n.toString();
     return `${thousandSeparated(Math.floor(n / 1000))}.`
