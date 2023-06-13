@@ -12,13 +12,12 @@ function escapeNonUserInput(text: string) {
     return text;
 }
 
-export async function sendMessage(botToken: string, chatId: number, text: string, replyToMessageId?: number, forceReply?: boolean) {
+export async function sendMessage(botToken: string, chatId: number, text: string, forceReply?: boolean) {
     const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             chat_id: chatId,
-            reply_to_message_id: replyToMessageId,
             text: escapeNonUserInput(text),
             parse_mode: "MarkdownV2",
             reply_markup: forceReply ? { force_reply: true, selective: true } : undefined,

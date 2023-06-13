@@ -11,15 +11,14 @@ export async function getUpdateResponse(update: Update, env: Env) {
 
 async function respondMessage(message: Message, env: Env) {
     const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
-    const reply = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id);
-    const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, message.message_id, true);
+    const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, true);
     const edit = (messageId: number, text: string) => editMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, messageId, text);
     if (message.text === "/start" || message.text === "/bantuan") return send(helpMessage);
     if (message.text === "/catat") return ask(createItemsQuestion);
     if (message.text === "/lihat") return ask(readItemsQuestion);
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
-        return replyForItemsCreation(reply, edit, message.text, env.DB);
+        return replyForItemsCreation(send, edit, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
-        return replyForReadItems(reply, ask, message.chat.id, message.text, env.DB);
+        return replyForReadItems(send, ask, message.chat.id, message.text, env.DB);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
 }
