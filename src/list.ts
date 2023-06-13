@@ -24,13 +24,22 @@ async function replyWithItems(reply: SendTextFn, items?: Item[]) {
     if (!items?.length) return reply("_catatan masih kosong_");
     let text = "*=== DAFTAR CATATAN ===*";
     let lastCreationDate = "0000-00-00";
-    for (const item of items) {
-        if (!item.created_at.startsWith(lastCreationDate)) {
-            lastCreationDate = item.created_at.substring(0, 10);
-            text += `\n\n__${escapeUserInput(lastCreationDate)}__`;
+    let total = 0;
+    let grandTotal = 0;
+    for (const { name, price, created_at } of items) {
+        if (!created_at.startsWith(lastCreationDate)) {
+            if (lastCreationDate !== "0000-00-00") {
+                text += `\n_total: ${thousandSeparated(total)}_`;
+                total = 0;
+            }
+            lastCreationDate = created_at.substring(0, 10);
+            text += `\n\n__${lastCreationDate}__`;
         }
-        text += escapeUserInput(`\n${item.created_at.substring(11, 16)} ${item.name} ${thousandSeparated(item.price)}`);
+        total += price;
+        grandTotal += price;
+        text += `\n${created_at.substring(11, 16)} ${escapeUserInput(name)} ${thousandSeparated(price)}`;
     }
+    text += `\n_total: ${thousandSeparated(total)}_\n\n*_grand total: ${thousandSeparated(grandTotal)}_*`;
     return reply(text);
 }
 
