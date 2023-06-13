@@ -1,7 +1,8 @@
-import { createItemsQuestion, replyForItemsCreation } from "./create";
-import { readItemsQuestion, replyForReadItems } from "./list";
-import { helpMessage } from "./help";
 import { editMessage, sendMessage } from "./send";
+import { createItemsQuestion, replyForItemsCreation } from "./create";
+import { readItemsQuestion, replyForItemsReading } from "./read";
+import { noItemToDelete, replyForItemDeletion } from "./delete";
+import { helpMessage } from "./help";
 
 export async function getUpdateResponse(update: Update, env: Env) {
     if (update.message) await respondMessage(update.message, env)
@@ -16,9 +17,12 @@ async function respondMessage(message: Message, env: Env) {
     if (message.text === "/start" || message.text === "/bantuan") return send(helpMessage);
     if (message.text === "/catat") return ask(createItemsQuestion);
     if (message.text === "/lihat") return ask(readItemsQuestion);
+    if (message.text === "/hapus" && !message.reply_to_message) return send(noItemToDelete);
+    if (message.text === "/hapus" && message.reply_to_message)
+        return replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message.message_id, message.reply_to_message.text ?? "", env.DB);
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(send, edit, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
-        return replyForReadItems(send, ask, message.chat.id, message.text, env.DB);
+        return replyForItemsReading(send, ask, message.chat.id, message.text, env.DB);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
 }

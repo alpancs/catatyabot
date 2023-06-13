@@ -3,18 +3,18 @@ import { escapeUserInput } from "./send";
 export const createItemsQuestion = "apa saja yang mau dicatat?";
 const answerPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
 
-export async function replyForItemsCreation(reply: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
+export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const line of text.split("\n")) {
-        await replyForItemCreation(reply, edit, line, db);
+        await replyForItemCreation(send, edit, line, db);
     }
 }
 
-async function replyForItemCreation(reply: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
+async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     const match = text.match(answerPattern);
-    if (!match) return reply(`"${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya 🤷‍♂️`);
+    if (!match) return send(`"${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya 🤷‍♂️`);
 
     const { name, price } = parse(match)
-    const replyResponse = await reply(`*${escapeUserInput(name)}* *${price}* dicatat ✅`);
+    const replyResponse = await send(`*${escapeUserInput(name)}* *${price}* dicatat ✅`);
     const { result } = await replyResponse.json<{ result: Message }>();
 
     try {
