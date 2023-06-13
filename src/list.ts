@@ -1,17 +1,19 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(\d+)\s*(hari)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/i;
+const answerPattern = /^\s*(\d+)\s*(hari)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/;
 
 export async function replyForReadItems(reply: SendTextFn, ask: SendTextFn, chatId: number, text: string, db: D1Database) {
+    text = text.toLowerCase();
     const match = text.match(answerPattern);
-    if (!match) return ask(readItemsQuestion);
+    if (!(match || text.startsWith("dari awal") || text.startsWith("semua"))) {
+        return ask(readItemsQuestion);
+    }
 
+    let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
+    if (match) query += ` AND created_at >= datetime('now', '-${match[1]} days')`;
     try {
-        const { results } = await db
-            .prepare("SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ?1 AND created_at >= datetime('now', ?2);")
-            .bind(chatId, `-${parseInt(match[1])} days`).all<Item>();
-        return replyWithItems(reply, results);
+        return replyWithItems(reply, (await db.prepare(query).all<Item>()).results);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
         return reply("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 🙏");
