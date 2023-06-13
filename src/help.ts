@@ -4,13 +4,11 @@ export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
 
 2. panggil bot menggunakan perintah berikut,
 
-    - /catat membuat bot bersiap mencatat 📝, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus
+    - /catat membuat bot bersiap mencatat, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus.
 
-    - gunakan /lihat untuk melihat daftar catatan 📃
+    - gunakan /lihat untuk melihat daftar catatan. contoh balasan: "1 hari", "2", "3 hari yg lalu", "dari awal", "semua", atau "semuanya".
 
-    - gunakan /rangkum untuk merangkum catatan selama beberapa waktu terakhir 📊
-
-    - dan balas suatu pesan catatan dari bot dengan /hapus untuk menghapusnya 🗑️
+    - kalau mau menghapus suatu catatan, balas pesan catatan dari bot yang ada tanda ✅nya dengan /hapus.
 
 satu pesan boleh berisi lebih dari satu catatan lho (1 baris untuk 1 catatan), dan bisa pakai satuan ribu/rb/k/juta/jt juga 🙂
 
