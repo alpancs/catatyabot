@@ -5,6 +5,8 @@ import { replyForItemUpdate } from "./update";
 import { noItemToDelete, replyForItemDeletion } from "./delete";
 import { helpMessage } from "./help";
 
+let ignoredMessageCounts: { [key: number]: number } = {};
+
 export async function getUpdateResponse(update: Update, env: Env) {
     if (update.message) await respondMessage(update.message, env)
     else console.info(JSON.stringify({ status: "ignored", reason: "the update does not contain a message", update }));
@@ -29,4 +31,9 @@ async function respondMessage(message: Message, env: Env) {
     if (message.reply_to_message && itemMatch)
         return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message.message_id, itemMatch, env.DB);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
+    ignoredMessageCounts[message.chat.id] = (ignoredMessageCounts[message.chat.id] ?? 0) + 1;
+    if (ignoredMessageCounts[message.chat.id] > 3) {
+        ignoredMessageCounts[message.chat.id] = 0;
+        return send("kalau bingung bisa pencet /bantuan atau tanya langsung ke @alpancs 💁‍♂️");
+    }
 }
