@@ -1,24 +1,24 @@
 export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
 
-1. undang @catatyabot ke suatu Telegram _group_, atau boleh juga langsung _chat_ ke bot 😊
+1. Undang @catatyabot ke suatu Telegram _group_, atau boleh juga langsung _chat_ ke bot 😊
 
-2. panggil bot menggunakan perintah berikut,
+2. Panggil bot menggunakan perintah berikut,
 
-    - /catat membuat bot bersiap mencatat, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus.
+    - Pencet /catat untuk membuat bot bersiap mencatat, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus.
 
-    - gunakan /lihat untuk melihat daftar catatan. contoh balasan: "1 hari", "2", "3 hari yg lalu", "dari awal", "semua", atau "semuanya".
+    - Gunakan /lihat untuk melihat daftar catatan. contoh balasan: "1 hari", "2", "3 hari yg lalu", "dari awal", "semua", atau "semuanya".
 
-    - kalau mau menghapus suatu catatan, balas pesan catatan dari bot yang ada tanda ✅nya dengan /hapus.
+    - Kalau mau menghapus suatu catatan, balas pesan catatan dari bot (yang ada tanda ✅nya) dengan /hapus.
 
-satu pesan boleh berisi lebih dari satu catatan lho (1 baris untuk 1 catatan), dan bisa pakai satuan ribu/rb/k/juta/jt juga 🙂
+Satu pesan boleh berisi lebih dari satu catatan lho (1 baris untuk 1 catatan), dan bisa pakai satuan ribu/rb/k/juta/jt juga 🙂
 
-contoh pesannya seperti ini 👇
+Contoh pesannya seperti ini 👇
 _sayur kangkung 2500_
 _ayam 1 kg 27k_
 _susu 86 ribu_
 _sapu serba guna 1.75jt_
 
-selain itu anda juga dapat mengubah catatan yang sudah ditulis oleh bot. cukup balas pesan catatan dari bot dengan nama & harga barang yang baru.
+Selain itu anda juga dapat mengubah suatu catatan. caranya dengan membalas pesan catatan dari bot (yang ada tanda ✅nya) dengan nama & harga barang yang baru.
 
 
 _ℹ️ saat ini bot sedang dalam fase pengembangan ulang dan belum berfungsi normal_`;
