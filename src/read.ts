@@ -56,7 +56,7 @@ function idDateFormat(date: string) {
 
 function parseDays(match: RegExpMatchArray) {
     let days = parseInt(match[1]);
-    let unit = match[2]?.toLocaleLowerCase();
+    const unit = match[2];
     if (unit === "pekan" || unit === "minggu") days *= 7;
     else if (unit === "bulan" || unit === "bln") days *= 30;
     else if (unit === "tahun" || unit === "thn" || unit === "th") days *= 365;

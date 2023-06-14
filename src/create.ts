@@ -2,7 +2,7 @@ import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
 export const createItemsQuestion = "apa saja yang mau dicatat?";
-export const answerPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
+export const itemPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
 
 export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const line of text.split("\n")) {
@@ -11,10 +11,10 @@ export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, 
 }
 
 async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
-    const match = text.match(answerPattern);
+    const match = text.match(itemPattern);
     if (!match) return send(`"${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya 🤷‍♂️`);
 
-    const { name, price } = parse(match)
+    const { name, price } = parseItemMatch(match)
     const replyResponse = await send(`*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`);
     const { result } = await replyResponse.json<{ result: Message }>();
 
@@ -23,11 +23,11 @@ async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, text: st
             .bind(result.chat.id, result.message_id, name, price).run();
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
-        await edit(result.message_id, `*${escapeUserInput(name)}* *${price}* gagal dicatat ❌`);
+        await edit(result.message_id, `*${escapeUserInput(name)}* gagal dicatat 😵`);
     }
 }
 
-function parse(match: RegExpMatchArray) {
+export function parseItemMatch(match: RegExpMatchArray) {
     let price = parseFloat(match[2].replace(",", "."));
     const unit = match[3]?.toLowerCase();
     if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;

@@ -1,6 +1,7 @@
 import { editMessage, sendMessage } from "./send";
-import { createItemsQuestion, replyForItemsCreation } from "./create";
+import { createItemsQuestion, replyForItemsCreation, itemPattern } from "./create";
 import { readItemsQuestion, replyForItemsReading } from "./read";
+import { replyForItemUpdate } from "./update";
 import { noItemToDelete, replyForItemDeletion } from "./delete";
 import { helpMessage } from "./help";
 
@@ -24,5 +25,8 @@ async function respondMessage(message: Message, env: Env) {
         return replyForItemsCreation(send, edit, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
         return replyForItemsReading(send, ask, message.chat.id, message.text, env.DB);
+    const itemMatch = message.text?.match(itemPattern);
+    if (message.reply_to_message && itemMatch)
+        return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message.message_id, itemMatch, env.DB);
     console.info(JSON.stringify({ status: "ignored", reason: "the message does not match any cases", message }));
 }

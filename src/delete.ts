@@ -9,8 +9,8 @@ export async function replyForItemDeletion(send: SendTextFn, edit: EditTextFn, c
         const deletedItem = await db.prepare("DELETE FROM items WHERE chat_id = ?1 AND message_id = ?2 RETURNING *")
             .bind(chatId, replyToMessageId).first<Item | null>();
         if (deletedItem) {
-            await edit(replyToMessageId, `~${escapeUserInput(deletedItem.name)} ${thousandSeparated(deletedItem.price)} dicatat~`);
-            await send(`${escapeUserInput(deletedItem.name)} ${thousandSeparated(deletedItem.price)} sudah dihapus 🚮`);
+            await edit(replyToMessageId, `~*${escapeUserInput(deletedItem.name)}* *${thousandSeparated(deletedItem.price)}* dicatat ✅~`);
+            await send(`${escapeUserInput(deletedItem.name)} sudah dihapus 🚮`);
         }
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
