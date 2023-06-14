@@ -1,7 +1,7 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(\d+)\s*(hari)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/;
+const answerPattern = /^\s*(\d+)\s*(hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/;
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -13,8 +13,12 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
     }
 
     let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
-    if (match) query += ` AND created_at >= datetime('now', '-${match[1]} days')`;
-    let title = match ? `*=== CATATAN DARI ${match[1]} HARI YANG LALU ===*` : "*=== SEMUA CATATAN ===*";
+    let title = "*=== SEMUA CATATAN ===*";
+    if (match) {
+        const days = parseDays(match);
+        query += ` AND created_at >= datetime('now', '-${days} days')`;
+        title = `*=== CATATAN DARI ${days} HARI YANG LALU ===*`;
+    }
     try {
         return replyWithItems(send, title, (await db.prepare(query).all<Item>()).results);
     } catch (error: any) {
@@ -36,7 +40,7 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
                 total = 0;
             }
             lastCreationDate = created_at.substring(0, 10);
-            text += `\n\n*__${idFormatted(lastCreationDate)}__*`;
+            text += `\n\n*__${idDateFormat(lastCreationDate)}__*`;
         }
         total += price;
         grandTotal += price;
@@ -46,8 +50,17 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
     return send(text);
 }
 
-function idFormatted(date: string) {
+function idDateFormat(date: string) {
     return `${parseInt(date.substring(8, 10))} ${months[parseInt(date.substring(5, 7)) - 1]} ${date.substring(0, 4)}`
+}
+
+function parseDays(match: RegExpMatchArray) {
+    let days = parseInt(match[1]);
+    let unit = match[2]?.toLocaleLowerCase();
+    if (unit === "pekan" || unit === "minggu") days *= 7;
+    else if (unit === "bulan" || unit === "bln") days *= 30;
+    else if (unit === "tahun" || unit === "thn" || unit === "th") days *= 365;
+    return days;
 }
 
 export function thousandSeparated(n: number): string {
