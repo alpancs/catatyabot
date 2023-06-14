@@ -18,7 +18,4 @@ _ayam 1 kg 27k_
 _susu 86 ribu_
 _sapu serba guna 1.75jt_
 
-Selain itu anda juga dapat mengubah suatu catatan. caranya dengan membalas pesan catatan dari bot (yang ada tanda ✅nya) dengan nama & harga barang yang baru.
-
-
-_ℹ️ saat ini bot sedang dalam fase pengembangan ulang dan belum berfungsi normal_`;
+Selain itu anda juga dapat mengubah suatu catatan. caranya dengan membalas pesan catatan dari bot (yang ada tanda ✅nya) dengan nama & harga barang yang baru.`;
