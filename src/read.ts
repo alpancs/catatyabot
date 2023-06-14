@@ -1,7 +1,7 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(\d+)\s*(hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?\s*(y(an)?g)?\s*(lalu)?\s*(ya|aja|\.*)?\s*$/;
+const answerPattern = /^\s*(\d+)\s*(hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?\s*(y(an)?g)?\s*(lalu|terakhir)?\s*\.*\s*$/;
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
