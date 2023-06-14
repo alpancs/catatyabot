@@ -6,7 +6,7 @@ export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
 
     - Pencet /catat untuk membuat bot bersiap mencatat, lalu balas dengan menuliskan satu atau beberapa catatan sekaligus.
 
-    - Gunakan /lihat untuk melihat daftar catatan. contoh balasan: "1 hari", "2", "3 hari yg lalu", "dari awal", "semua", atau "semuanya".
+    - Gunakan /lihat untuk melihat daftar catatan. contoh balasan: "1 hari", "2 bulan", "3", "dari awal", "semua", atau "semuanya".
 
     - Kalau mau menghapus suatu catatan, balas pesan catatan dari bot (yang ada tanda ✅nya) dengan /hapus.
 
