@@ -23,7 +23,7 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
         return replyWithItems(send, title, (await db.prepare(query).all<Item>()).results);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
-        return send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 🙏");
+        return send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
     }
 }
 
