@@ -18,7 +18,7 @@ export async function sendMessage(botToken: string, chatId: number, text: string
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             chat_id: chatId,
-            text: escapeNonUserInput(text),
+            text: escapeNonUserInput(text).substring(0, 4096),
             parse_mode: "MarkdownV2",
             reply_markup: forceReply ? { force_reply: true, selective: true } : undefined,
         }),
@@ -34,7 +34,7 @@ export async function editMessage(botToken: string, chatId: number, messageId: n
         body: JSON.stringify({
             chat_id: chatId,
             message_id: messageId,
-            text: escapeNonUserInput(text),
+            text: escapeNonUserInput(text).substring(0, 4096),
             parse_mode: "MarkdownV2",
         }),
     });
