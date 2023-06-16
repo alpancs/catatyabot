@@ -5,15 +5,12 @@ export const createItemsQuestion = "apa saja yang mau dicatat?";
 export const itemPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
 
 export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
-    for (const line of text.split("\n")) {
-        await replyForItemCreation(send, edit, line, db);
+    for (const match of text.split("\n").map(l => l.match(itemPattern))) {
+        if (match) await replyForItemCreation(send, edit, match, db);
     }
 }
 
-async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
-    const match = text.match(itemPattern);
-    if (!match) return send(`"${escapeUserInput(text)}" tidak dicatat karena tidak ada harganya 🤷‍♂️`);
-
+async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: RegExpMatchArray, db: D1Database) {
     const { name, price } = parseItemMatch(match)
     const replyResponse = await send(`*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`);
     const { result } = await replyResponse.json<{ result: Message }>();
