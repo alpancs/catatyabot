@@ -31,20 +31,21 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
     if (!items?.length) return send("_catatan masih kosong_");
     let text = title;
     let lastCreationDate = "0000-00-00";
+    let count = 0;
     let total = 0;
     let grandTotal = 0;
     for (const { name, price, created_at } of items) {
         if (!created_at.startsWith(lastCreationDate)) {
-            if (lastCreationDate !== "0000-00-00") {
-                text += `\n_total: ${thousandSeparated(total)}_`;
-                total = 0;
-            }
+            if (count > 1) text += `\n_total: ${thousandSeparated(total)}_`;
             lastCreationDate = created_at.substring(0, 10);
             text += `\n\n*__${idDateFormat(lastCreationDate)}__*`;
+            count = 0;
+            total = 0;
         }
+        text += `\n${created_at.substring(11, 16)} ${escapeUserInput(name)} ${thousandSeparated(price)}`;
+        count += 1;
         total += price;
         grandTotal += price;
-        text += `\n${created_at.substring(11, 16)} ${escapeUserInput(name)} ${thousandSeparated(price)}`;
     }
     text += `\n_total: ${thousandSeparated(total)}_\n\n*_grand total: ${thousandSeparated(grandTotal)}_*`;
     return send(text);
