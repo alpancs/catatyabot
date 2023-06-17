@@ -1,6 +1,6 @@
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
 
 env:
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -13,4 +13,5 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      - run: npm run ci
       - run: npm run deploy
