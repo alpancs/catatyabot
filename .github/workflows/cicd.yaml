@@ -4,6 +4,7 @@ on:
 
 env:
   CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  NO_D1_WARNING: "true"
 
 jobs:
   deploy:
