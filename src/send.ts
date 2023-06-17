@@ -15,12 +15,14 @@ function escapeNonUserInput(text: string) {
 
 export async function sendMessage(botToken: string, chatId: number, text: string, forceReply?: boolean) {
     text = escapeNonUserInput(text);
+    let lastResponse: Response<Message>;
     while (text) {
         let i = sendTextLimit;
         if (text.length > sendTextLimit) while (text[i] !== "\n") i--;
-        await sendPartialMessage(botToken, chatId, text.substring(0, i), forceReply);
+        lastResponse = await sendPartialMessage(botToken, chatId, text.substring(0, i), forceReply);
         text = text.substring(i + 1);
     }
+    return lastResponse;
 }
 
 async function sendPartialMessage(botToken: string, chatId: number, text: string, forceReply?: boolean) {
