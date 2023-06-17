@@ -12,8 +12,7 @@ export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, 
 
 async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: RegExpMatchArray, db: D1Database) {
     const { name, price } = parseItemMatch(match)
-    const replyResponse = await send(`*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`);
-    const { result } = await replyResponse.json<{ result: Message }>();
+    const { result } = await (await send(`*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`)).json<{ result: Message }>();
 
     try {
         await db.prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?1, ?2, ?3, ?4, datetime('now'));")
