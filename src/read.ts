@@ -47,7 +47,8 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
         total += price;
         grandTotal += price;
     }
-    text += `\n_total: ${thousandSeparated(total)}_\n\n*_grand total: ${thousandSeparated(grandTotal)}_*`;
+    if (count > 1) text += `\n_total: ${thousandSeparated(total)}_`;
+    text += `\n\n*_grand total: ${thousandSeparated(grandTotal)}_*`;
     return send(text);
 }
 
