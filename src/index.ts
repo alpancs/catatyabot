@@ -4,12 +4,12 @@ export default {
 	async fetch(request: Request, env: Env) {
 		const { pathname } = new URL(request.url);
 		if (request.method == "POST" && pathname == "/webhook/telegram") {
-			return this.handleRequestWebhookTelegram(request, env);
+			return this.handleWebhookTelegram(request, env);
 		}
 		return new Response(undefined, { status: 404 });
 	},
 
-	async handleRequestWebhookTelegram(request: Request, env: Env) {
+	async handleWebhookTelegram(request: Request, env: Env) {
 		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.TELEGRAM_WEBHOOK_SECRET_TOKEN) {
 			return new Response(undefined, { status: 401 });
 		}
