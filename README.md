@@ -16,7 +16,8 @@ Kirim pesan berupa `/start` atau `/bantuan` ke bot, dan nanti akan muncul cara m
       > _susu 86 ribu_
       >
       > _sapu serba guna 1.75jt_
-    - `/lihat` untuk melihat daftar catatan. contoh balasan: "3 hari", "2 pekan", "1 bulan", "dari awal", "semua", atau "semuanya".
+    - `/lihat` untuk melihat daftar catatan.
+      Contohnya: _3 hari_, _2 pekan_, _1 bulan_, _dari awal_, _semua_, atau _semuanya_.
     - `/hapus` untuk menghapus suatu catatan, dengan cara terlebih dahulu membalas (_reply_) catatan dari bot (yang ada tanda ✅nya) yang ingin dihapus.
 
 Selain itu anda juga dapat mengubah suatu catatan. Caranya dengan membalas catatan dari bot (yang ada tanda ✅nya) dengan nama & harga barang yang baru.
