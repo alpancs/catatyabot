@@ -20,8 +20,8 @@ async function respondMessage(message: Message, env: Env) {
     if (message.text === "/start" || message.text === "/bantuan") return send(helpMessage);
     if (message.text === "/catat") return ask(createItemsQuestion);
     if (message.text === "/lihat") return ask(readItemsQuestion);
-    if (message.text === "/hapus" && !message.reply_to_message) return send(noItemToDelete);
-    if (message.text === "/hapus" && message.reply_to_message)
+    if (message.text?.includes("hapus") && !message.reply_to_message) return send(noItemToDelete);
+    if (message.text?.includes("hapus") && message.reply_to_message)
         return replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message.message_id, env.DB);
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(send, edit, message.text, env.DB);
