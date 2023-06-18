@@ -25,7 +25,7 @@ async function sendCleanMessage(botToken: string, chatId: number, text: string, 
             chat_id: chatId,
             text: head,
             parse_mode: "MarkdownV2",
-            reply_markup: forceReply ? { force_reply: true, selective: true } : undefined,
+            reply_markup: forceReply ? { force_reply: true } : undefined,
         }),
     });
     if (!response.ok) throw new Error(await response.text());
