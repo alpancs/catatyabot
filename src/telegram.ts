@@ -17,9 +17,9 @@ async function respondMessage(message: Message, env: Env) {
     const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
     const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, true);
     const edit = (messageId: number, text: string) => editMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, messageId, text);
-    if (message.text?.includes("start") || message.text?.includes("bantuan")) return send(helpMessage);
-    if (message.text?.includes("catat")) return ask(createItemsQuestion);
-    if (message.text?.includes("lihat")) return ask(readItemsQuestion);
+    if (message.text?.match(/^\s*\/?(start|bantuan)(@catatyabot)?\s*$/)) return send(helpMessage);
+    if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/)) return ask(createItemsQuestion);
+    if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/)) return ask(readItemsQuestion);
     if (message.text?.includes("hapus") && !message.reply_to_message) return send(noItemToDelete);
     if (message.text?.includes("hapus") && message.reply_to_message)
         return replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message.message_id, env.DB);
