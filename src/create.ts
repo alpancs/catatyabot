@@ -2,7 +2,7 @@ import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
 export const createItemsQuestion = "apa saja yang mau dicatat?";
-export const itemPattern = /^\s*(.+)\s+(-?\d+[,.]?\d*)\s*(ribu|rb|k|juta|jt)?\s*$/i;
+export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>-?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>-?\d+(?:[,.]\d*)*))$/i;
 
 export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const match of text.split("\n").map(l => l.match(itemPattern))) {
@@ -24,9 +24,14 @@ async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: R
 }
 
 export function parseItemMatch(match: RegExpMatchArray) {
-    let price = parseFloat(match[2].replace(",", "."));
-    const unit = match[3]?.toLowerCase();
-    if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
-    else if (unit === 'juta' || unit === 'jt') price *= 1000000;
-    return { name: match[1], price };
+    const groups = match.groups!;
+    const name = groups.name.trim();
+    if (groups.withUnit) {
+        let price = parseFloat(groups.priceFloat.replace(",", "."));
+        const unit = groups.unit.toLowerCase();
+        if (unit === 'ribu' || unit === 'rb' || unit === 'k') price *= 1000;
+        else if (unit === 'juta' || unit === 'jt') price *= 1000000;
+        return { name, price };
+    }
+    return { name, price: parseInt(groups.priceInt.replace(/[,.]/g, "")) };
 }
