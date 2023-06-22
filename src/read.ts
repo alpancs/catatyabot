@@ -42,7 +42,7 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
             count = 0;
             total = 0;
         }
-        text += `\n${created_at.substring(11, 16)} ${escapeUserInput(name)} ${thousandSeparated(price)}`;
+        text += `\n_${created_at.substring(11, 16)}_ ${escapeUserInput(name)} ${thousandSeparated(price)}`;
         count += 1;
         total += price;
         grandTotal += price;
