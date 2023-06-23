@@ -2,7 +2,7 @@ import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
 export const createItemsQuestion = "apa saja yang mau dicatat?";
-export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>-?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>-?\d+(?:[,.]\d*)*))$/i;
+export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>-?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>-?\d+(?:[,.]\d*)*))\s*$/i;
 
 export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, text: string, db: D1Database) {
     for (const match of text.split("\n").map(l => l.match(itemPattern))) {
