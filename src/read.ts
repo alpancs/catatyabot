@@ -28,7 +28,7 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
 }
 
 async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
-    if (!items?.length) return send("_catatan masih kosong_");
+    if (!items?.length) return send(`${title}\n\n_masih kosong_`);
     let text = title;
     let lastCreationDate = "0000-00-00";
     let count = 0;
