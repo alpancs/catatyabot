@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tags (
+CREATE TABLE IF NOT EXISTS hashtags (
     chat_id INTEGER NOT NULL,
     message_id INTEGER NOT NULL,
     name TEXT NOT NULL,
