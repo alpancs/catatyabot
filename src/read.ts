@@ -11,14 +11,25 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
 
     const { days, hashtag } = parseMatch(match);
     const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
-    let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
     let title = `*=== SEMUA CATATAN${hashtagOnTitle} ===*`;
+    let query = `
+        SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at
+        FROM items
+        LEFT JOIN hashtags USING (chat_id, message_id)
+        WHERE chat_id = ${chatId}`;
+    let values = [];
     if (days) {
-        query += ` AND created_at >= datetime('now', '-${days} days')`;
         title = `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
+        query += ` AND created_at >= datetime('now', ?)`;
+        values.push(`-${days} days`);
     }
+    if (hashtag) {
+        query += ` AND lower(hashtag) = lower(?)`;
+        values.push(hashtag);
+    }
+
     try {
-        return replyWithItems(send, title, (await db.prepare(query).all<Item>()).results);
+        return replyWithItems(send, title, (await db.prepare(query).bind(...values).all<Item>()).results);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
         return send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
