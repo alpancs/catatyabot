@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS hashtags (
     chat_id INTEGER NOT NULL,
     message_id INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    normalized_name TEXT NOT NULL,
-    PRIMARY KEY (chat_id, message_id, normalized_name),
+    hashtag TEXT NOT NULL,
+    PRIMARY KEY (chat_id, message_id, hashtag),
     FOREIGN KEY (chat_id, message_id) REFERENCES items(chat_id, message_id)
+        ON UPDATE CASCADE ON DELETE CASCADE
 );
