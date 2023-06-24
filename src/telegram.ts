@@ -29,7 +29,7 @@ async function respondMessage(message: Message, env: Env) {
         return replyForItemsReading(send, ask, message.chat.id, message.text, env.DB);
     const itemMatch = message.text?.match(itemPattern);
     if (message.reply_to_message && itemMatch)
-        return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message.message_id, itemMatch, env.DB);
+        return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message, itemMatch, env.DB);
     console.info({ status: "ignored", reason: "the message does not match any cases", message });
     ignoredMessageCounts[message.chat.id] = (ignoredMessageCounts[message.chat.id] ?? 0) + 1;
     if (ignoredMessageCounts[message.chat.id] > 3) {
