@@ -13,20 +13,25 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
     const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
     let title = `*=== SEMUA CATATAN${hashtagOnTitle} ===*`;
     let query = `
-        SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at
+        SELECT
+            chat_id, message_id, name, price,
+            datetime(created_at, '+7 hours') created_at,
+            group_concat(ht1.hashtag, ' ') hashtags
         FROM items
-        LEFT JOIN hashtags USING (chat_id, message_id)
-        WHERE chat_id = ${chatId}`;
-    let values = [];
+        LEFT JOIN hashtags ht1 USING (chat_id, message_id)
+        ${hashtag ? "LEFT JOIN hashtags ht2 USING (chat_id, message_id)" : ""}
+        WHERE chat_id = ?`;
+    let values: any[] = [chatId];
     if (days) {
         title = `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
         query += ` AND created_at >= datetime('now', ?)`;
         values.push(`-${days} days`);
     }
     if (hashtag) {
-        query += ` AND lower(hashtag) = lower(?)`;
+        query += ` AND lower(ht2.hashtag) = lower(?)`;
         values.push(hashtag);
     }
+    query += " GROUP BY chat_id, message_id";
 
     try {
         return replyWithItems(send, title, (await db.prepare(query).bind(...values).all<Item>()).results);
@@ -43,7 +48,7 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
     let count = 0;
     let total = 0;
     let grandTotal = 0;
-    for (const { name, price, created_at } of items) {
+    for (const { name, price, hashtags, created_at } of items) {
         if (!created_at.startsWith(lastCreationDate)) {
             if (count > 1) text += `\n_total: ${thousandSeparated(total)}_`;
             lastCreationDate = created_at.substring(0, 10);
@@ -52,6 +57,7 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
             total = 0;
         }
         text += `\n_${created_at.substring(11, 16)}_ ${escapeUserInput(name)} ${thousandSeparated(price)}`;
+        if (hashtags) text += ` ${hashtags}`;
         count += 1;
         total += price;
         grandTotal += price;
