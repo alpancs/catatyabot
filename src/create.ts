@@ -12,9 +12,9 @@ export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, 
 
 async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: RegExpMatchArray, db: D1Database) {
     const { name, price, hashtags } = parseItemMatch(match);
-    let notedMessage = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
-    for (const hashtag of hashtags) notedMessage += ` ${hashtag}`;
-    const { result } = await (await send(notedMessage)).json<{ result: Message }>();
+    let message = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
+    for (const hashtag of hashtags) message += ` ${hashtag}`;
+    const { result } = await (await send(message)).json<{ result: Message }>();
 
     let statements = [
         db.prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?1, ?2, ?3, ?4, datetime('now'));")
