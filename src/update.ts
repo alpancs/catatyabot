@@ -16,7 +16,9 @@ export async function replyForItemUpdate(send: SendTextFn, edit: EditTextFn, cha
 
     try {
         const updatedItems = (await db.batch(statements))[0].results;
-        if (updatedItems?.length) await edit(replyToMessage.message_id, `~${replyToMessage.text}~\n*${escapeUserInput(name)}* *${thousandSeparated(price)}*`);
+        let message = `~${replyToMessage.text}~\n*${escapeUserInput(name)}* *${thousandSeparated(price)}*`;
+        for (const hashtag of hashtags) message += ` ${hashtag}`;
+        if (updatedItems?.length) await edit(replyToMessage.message_id, message);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
         await send(`ada masalah pas lagi ubah catatan 😵`);
