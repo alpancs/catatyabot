@@ -10,11 +10,12 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
     if (!match) return ask(readItemsQuestion);
 
     const { days, hashtag } = parseMatch(match);
+    const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
     let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
-    let title = "*=== SEMUA CATATAN ===*";
+    let title = `*=== SEMUA CATATAN${hashtagOnTitle} ===*`;
     if (days) {
         query += ` AND created_at >= datetime('now', '-${days} days')`;
-        title = `*=== CATATAN DARI ${days} HARI YANG LALU ===*`;
+        title = `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
     }
     try {
         return replyWithItems(send, title, (await db.prepare(query).all<Item>()).results);
@@ -54,13 +55,13 @@ function idDateFormat(date: string) {
 }
 
 function parseMatch(match: RegExpMatchArray) {
-    const groups = match.groups!;
+    const groups: { [key: string]: string | undefined } = match.groups!;
     const hashtag = groups.hashtag;
-    const answer = groups.answer.toLowerCase();
+    const answer = groups.answer?.toLowerCase();
     if (answer === "dari awal" || answer === "semua" || answer === "semuanya")
         return { days: undefined, hashtag };
 
-    let days = parseFloat(groups.coef);
+    let days = parseFloat(groups.coef!);
     if (groups.unit === "pekan" || groups.unit === "minggu") days *= 7;
     else if (groups.unit === "bulan" || groups.unit === "bln") days *= 30;
     else if (groups.unit === "tahun" || groups.unit === "thn" || groups.unit === "th") days *= 365;
