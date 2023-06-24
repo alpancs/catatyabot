@@ -10,7 +10,6 @@ export async function replyForItemUpdate(send: SendTextFn, edit: EditTextFn, cha
         db.prepare("DELETE FROM hashtags WHERE chat_id = ?1 AND message_id = ?2;")
             .bind(chatId, replyToMessage.message_id),
     ];
-    // TODO: fix broken references from table items
     const insertHashtagStmt = db.prepare("INSERT INTO hashtags (chat_id, message_id, hashtag) VALUES (?1, ?2, ?3);");
     for (const hashtag of hashtags) statements.push(insertHashtagStmt.bind(chatId, replyToMessage.message_id, hashtag));
 
@@ -21,6 +20,6 @@ export async function replyForItemUpdate(send: SendTextFn, edit: EditTextFn, cha
         if (updatedItems?.length) await edit(replyToMessage.message_id, message);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
-        await send(`ada masalah pas lagi ubah catatan 😵`);
+        if (!error.message.includes("Error code 787")) await send(`ada masalah pas lagi ubah catatan 😵`);
     }
 }
