@@ -8,9 +8,7 @@ const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
 export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, chatId: number, text: string, db: D1Database) {
     text = text.toLowerCase();
     const match = text.match(answerPattern);
-    if (!(match || text.startsWith("dari awal") || text.startsWith("semua"))) {
-        return ask(readItemsQuestion);
-    }
+    if (!(match || text.startsWith("dari awal") || text.startsWith("semua"))) return ask(readItemsQuestion);
 
     let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
     let title = "*=== SEMUA CATATAN ===*";
