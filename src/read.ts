@@ -16,10 +16,10 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
         SELECT
             chat_id, message_id, name, price,
             datetime(created_at, '+7 hours') created_at,
-            group_concat(ht1.hashtag, ' ') hashtags
+            group_concat(h1.hashtag, ' ') hashtags
         FROM items
-        LEFT JOIN hashtags ht1 USING (chat_id, message_id)
-        ${hashtag ? "LEFT JOIN hashtags ht2 USING (chat_id, message_id)" : ""}
+        LEFT JOIN hashtags h1 USING (chat_id, message_id)
+        ${hashtag ? "JOIN hashtags h2 USING (chat_id, message_id)" : ""}
         WHERE chat_id = ?`;
     let values: any[] = [chatId];
     if (days) {
@@ -28,7 +28,7 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
         values.push(`-${days} days`);
     }
     if (hashtag) {
-        query += ` AND lower(ht2.hashtag) = lower(?)`;
+        query += ` AND lower(h2.hashtag) = lower(?)`;
         values.push(hashtag);
     }
     query += " GROUP BY chat_id, message_id";
