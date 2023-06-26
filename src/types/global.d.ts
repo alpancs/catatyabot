@@ -15,7 +15,6 @@ declare global {
         message_id: number;
         name: string;
         price: number;
-        hashtags: string;
         created_at: string;
     }
 
