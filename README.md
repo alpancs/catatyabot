@@ -33,4 +33,4 @@ Kirim pesan berupa `/start` atau `/bantuan` ke bot, dan nanti akan muncul cara m
 
     - `/hapus` untuk menghapus suatu catatan, dengan cara terlebih dahulu membalas (_reply_) catatan dari bot (yang ada tanda ✅nya) yang ingin dihapus.
 
-Selain itu anda juga dapat mengubah suatu catatan. Caranya dengan membalas catatan dari bot (yang ada tanda ✅nya) dengan nama & harga barang yang baru.
+Selain itu anda juga dapat mengubah suatu catatan. Caranya dengan membalas catatan dari bot (yang ada tanda ✅nya) dengan nama, #hashtag, dan harga barang yang baru.
