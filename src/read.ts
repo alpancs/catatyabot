@@ -1,7 +1,7 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(?<answer>dari\s+awal|semua|semuanya|(?<coef>\d+\.?\d*)\s*(?<unit>hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?(?:\s+(?:yang\s+lalu|yg\s+lalu|terakhir))?)[\s.]*(?:\s+(?<hashtag>#\w+))?\s*$/i;
+const answerPattern = /^[\s-]*(?:(?<hashtagLeft>#\w+)\s+)?(?<answer>dari\s+awal|semua|semuanya|(?<coef>\d+\.?\d*)\s*(?<unit>hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?(?:\s+(?:yang\s+lalu|yg\s+lalu|terakhir))?)[\s.]*(?:\s+(?<hashtagRight>#\w+))?\s*$/i;
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -64,7 +64,7 @@ function idDateFormat(date: string) {
 
 function parseDaysMatch(match: RegExpMatchArray) {
     const groups: { [key: string]: string | undefined } = match.groups!;
-    const hashtag = groups.hashtag;
+    const hashtag = groups.hashtagLeft ?? groups.hashtagRight;
     const answer = groups.answer?.toLowerCase();
     if (answer === "dari awal" || answer === "semua" || answer === "semuanya")
         return { days: undefined, hashtag };
