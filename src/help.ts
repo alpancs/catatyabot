@@ -14,7 +14,7 @@ export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
     _sapu serba guna 4.4jt #perabot_
 
 
-  - /lihat untuk melihat daftar catatan. Contoh
+  - /lihat untuk melihat daftar catatan. Contohnya,
     - _3 hari_
     - _2 pekan_
     - _1 bulan_
@@ -22,7 +22,7 @@ export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
     - _semua_
     - _semuanya_
 
-    Melihat daftar catatan yang punya #hashtag tertentu
+    Melihat daftar catatan yang punya #hashtag tertentu aja:
     - _#jajan 1 bulan_
     - _semua #jajan_
     - _#sekolah 1 tahun terakhir_
