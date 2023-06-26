@@ -1,26 +1,31 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
-const answerPattern = /^\s*(\d+)\s*(hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?\s*(y(an)?g)?\s*(lalu|terakhir)?\s*\.*\s*$/;
+const answerPattern = /^[\s-]*(?:(?<hashtagLeft>#\w+)\s+)?(?<answer>dari\s+awal|semua|semuanya|(?<coef>\d+\.?\d*)\s*(?<unit>hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?(?:\s+(?:yang\s+lalu|yg\s+lalu|terakhir))?)[\s.]*(?:\s+(?<hashtagRight>#\w+))?\s*$/i;
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
 export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, chatId: number, text: string, db: D1Database) {
-    text = text.toLowerCase();
     const match = text.match(answerPattern);
-    if (!(match || text.startsWith("dari awal") || text.startsWith("semua"))) {
-        return ask(readItemsQuestion);
-    }
+    if (!match) return ask(readItemsQuestion);
 
-    let query = `SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at FROM items WHERE chat_id = ${chatId}`;
-    let title = "*=== SEMUA CATATAN ===*";
-    if (match) {
-        const days = parseDays(match);
-        query += ` AND created_at >= datetime('now', '-${days} days')`;
-        title = `*=== CATATAN DARI ${days} HARI YANG LALU ===*`;
-    }
+    const { days, hashtag } = parseDaysMatch(match);
+    const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
+    let title = days === undefined ? `*=== SEMUA CATATAN${hashtagOnTitle} ===*` : `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
+
+    let query = `
+        SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at
+        FROM items
+        ${hashtag ? "JOIN hashtags USING (chat_id, message_id)" : ""}
+        WHERE chat_id = ?
+        ${days === undefined ? "" : "AND created_at >= datetime('now', ?)"}
+        ${hashtag === undefined ? "" : "AND lower(hashtag) = lower(?)"}`;
+    let values: any[] = [chatId];
+    if (days !== undefined) values.push(`-${days} days`);
+    if (hashtag !== undefined) values.push(hashtag);
+
     try {
-        return replyWithItems(send, title, (await db.prepare(query).all<Item>()).results);
+        return replyWithItems(send, title, (await db.prepare(query).bind(...values).all<Item>()).results);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
         return send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
@@ -56,13 +61,18 @@ function idDateFormat(date: string) {
     return `${parseInt(date.substring(8, 10))} ${months[parseInt(date.substring(5, 7)) - 1]} ${date.substring(0, 4)}`
 }
 
-function parseDays(match: RegExpMatchArray) {
-    let days = parseInt(match[1]);
-    const unit = match[2];
-    if (unit === "pekan" || unit === "minggu") days *= 7;
-    else if (unit === "bulan" || unit === "bln") days *= 30;
-    else if (unit === "tahun" || unit === "thn" || unit === "th") days *= 365;
-    return days;
+function parseDaysMatch(match: RegExpMatchArray) {
+    const groups: { [key: string]: string | undefined } = match.groups!;
+    const hashtag = groups.hashtagLeft ?? groups.hashtagRight;
+    const answer = groups.answer?.toLowerCase();
+    if (answer === "dari awal" || answer === "semua" || answer === "semuanya")
+        return { days: undefined, hashtag };
+
+    let days = parseFloat(groups.coef!);
+    if (groups.unit === "pekan" || groups.unit === "minggu") days *= 7;
+    else if (groups.unit === "bulan" || groups.unit === "bln") days *= 30;
+    else if (groups.unit === "tahun" || groups.unit === "thn" || groups.unit === "th") days *= 365;
+    return { days, hashtag };
 }
 
 export function thousandSeparated(n: number): string {
