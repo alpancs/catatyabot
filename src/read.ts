@@ -39,7 +39,7 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
     let count = 0;
     let total = 0;
     let grandTotal = 0;
-    for (const { name, price, hashtags, created_at } of items) {
+    for (const { name, price, created_at } of items) {
         if (!created_at.startsWith(lastCreationDate)) {
             if (count > 1) text += `\n_total: ${thousandSeparated(total)}_`;
             lastCreationDate = created_at.substring(0, 10);
@@ -48,7 +48,6 @@ async function replyWithItems(send: SendTextFn, title: string, items?: Item[]) {
             total = 0;
         }
         text += `\n_${created_at.substring(11, 16)}_ ${escapeUserInput(name)} ${thousandSeparated(price)}`;
-        if (hashtags) text += ` ${hashtags}`;
         count += 1;
         total += price;
         grandTotal += price;
