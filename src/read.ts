@@ -9,29 +9,20 @@ export async function replyForItemsReading(send: SendTextFn, ask: SendTextFn, ch
     const match = text.match(answerPattern);
     if (!match) return ask(readItemsQuestion);
 
-    const { days, hashtag } = parseMatch(match);
+    const { days, hashtag } = parseDaysMatch(match);
     const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
-    let title = `*=== SEMUA CATATAN${hashtagOnTitle} ===*`;
+    let title = days === undefined ? `*=== SEMUA CATATAN${hashtagOnTitle} ===*` : `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
+
     let query = `
-        SELECT
-            chat_id, message_id, name, price,
-            datetime(created_at, '+7 hours') created_at,
-            group_concat(h1.hashtag, ' ') hashtags
+        SELECT chat_id, message_id, name, price, datetime(created_at, '+7 hours') created_at
         FROM items
-        LEFT JOIN hashtags h1 USING (chat_id, message_id)
-        ${hashtag ? "JOIN hashtags h2 USING (chat_id, message_id)" : ""}
-        WHERE chat_id = ?`;
+        ${hashtag ? "JOIN hashtags USING (chat_id, message_id)" : ""}
+        WHERE chat_id = ?
+        ${days === undefined ? "" : "AND created_at >= datetime('now', ?)"}
+        ${hashtag === undefined ? "" : "AND lower(hashtag) = lower(?)"}`;
     let values: any[] = [chatId];
-    if (days) {
-        title = `*=== CATATAN${hashtagOnTitle} DARI ${days} HARI YANG LALU ===*`;
-        query += ` AND created_at >= datetime('now', ?)`;
-        values.push(`-${days} days`);
-    }
-    if (hashtag) {
-        query += ` AND lower(h2.hashtag) = lower(?)`;
-        values.push(hashtag);
-    }
-    query += " GROUP BY chat_id, message_id";
+    if (days !== undefined) values.push(`-${days} days`);
+    if (hashtag !== undefined) values.push(hashtag);
 
     try {
         return replyWithItems(send, title, (await db.prepare(query).bind(...values).all<Item>()).results);
@@ -71,7 +62,7 @@ function idDateFormat(date: string) {
     return `${parseInt(date.substring(8, 10))} ${months[parseInt(date.substring(5, 7)) - 1]} ${date.substring(0, 4)}`
 }
 
-function parseMatch(match: RegExpMatchArray) {
+function parseDaysMatch(match: RegExpMatchArray) {
     const groups: { [key: string]: string | undefined } = match.groups!;
     const hashtag = groups.hashtag;
     const answer = groups.answer?.toLowerCase();

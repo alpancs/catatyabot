@@ -13,7 +13,6 @@ export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, 
 async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: RegExpMatchArray, db: D1Database) {
     const { name, price, hashtags } = parseItemMatch(match);
     let message = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
-    for (const hashtag of hashtags) message += ` ${hashtag}`;
     const { result } = await (await send(message)).json<{ result: Message }>();
 
     let statements = [
@@ -32,8 +31,8 @@ async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: R
 
 export function parseItemMatch(match: RegExpMatchArray) {
     const groups = match.groups!;
-    const name = groups.name.trim();
-    const hashtags = groups.rawHashtags ? groups.rawHashtags.trim().split(/\s+/) : [];
+    const name = groups.name.trim() + groups.rawHashtags;
+    const hashtags = (name.match(/(?:^|\s+)#\w+/ig) ?? []).map(s => s.trim());
     if (groups.withUnit) {
         let price = parseFloat(groups.priceFloat.replace(",", "."));
         const unit = groups.unit.toLowerCase();
