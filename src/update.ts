@@ -20,6 +20,6 @@ export async function replyForItemUpdate(send: SendTextFn, edit: EditTextFn, cha
         if (updatedItems?.length) await edit(replyToMessage.message_id, message);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
-        if (!error.message.includes("Error code 787")) await send(`ada masalah pas lagi ubah catatan 😵`);
+        await send(`ada masalah pas lagi ubah catatan 😵`);
     }
 }
