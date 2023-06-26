@@ -10,7 +10,7 @@ export async function replyForItemUpdate(send: SendTextFn, edit: EditTextFn, cha
         db.prepare("DELETE FROM hashtags WHERE chat_id = ?1 AND message_id = ?2;")
             .bind(chatId, replyToMessage.message_id),
     ];
-    const insertHashtagStmt = db.prepare("INSERT INTO hashtags (chat_id, message_id, hashtag) VALUES (?1, ?2, ?3);");
+    const insertHashtagStmt = db.prepare("INSERT OR IGNORE INTO hashtags (chat_id, message_id, hashtag) VALUES (?1, ?2, ?3);");
     for (const hashtag of hashtags) statements.push(insertHashtagStmt.bind(chatId, replyToMessage.message_id, hashtag));
 
     try {

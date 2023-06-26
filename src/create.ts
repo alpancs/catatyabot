@@ -20,7 +20,7 @@ async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: R
         db.prepare("INSERT INTO items (chat_id, message_id, name, price, created_at) VALUES (?1, ?2, ?3, ?4, datetime('now'));")
             .bind(result.chat.id, result.message_id, name, price)
     ];
-    const insertHashtagStmt = db.prepare("INSERT INTO hashtags (chat_id, message_id, hashtag) VALUES (?1, ?2, ?3);");
+    const insertHashtagStmt = db.prepare("INSERT OR IGNORE INTO hashtags (chat_id, message_id, hashtag) VALUES (?1, ?2, ?3);");
     for (const hashtag of hashtags) statements.push(insertHashtagStmt.bind(result.chat.id, result.message_id, hashtag));
     try {
         await db.batch(statements);
