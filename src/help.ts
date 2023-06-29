@@ -4,7 +4,7 @@ export const helpMessage = `*=== CARA MENGGUNAKAN @catatyabot ===*
 
 2. Panggil bot menggunakan perintah berikut
 
-  - /catat untuk membuat bot bersiap mencatat, lalu balas dengan menuliskan apa yang mau dicatat, berikut dengan harganya. Satu pesan bisa diisi lebih dari satu catatan lho (1 baris untuk 1 catatan), bisa pakai satuan ribu/rb/k/juta/jt 🙂, dan bisa pakai #hashtag juga 🎉.
+  - /catat untuk membuat bot bersiap mencatat, lalu balas dengan menuliskan apa yang mau dicatat, berikut dengan harganya. Satu pesan bisa diisi lebih dari satu catatan lho (1 baris untuk 1 catatan), bisa pakai satuan ribu/rb/k/juta/jt, dan bisa pakai #hashtag juga 🙂.
 
     Contohnya seperti ini 👇
 
