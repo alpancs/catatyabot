@@ -27,6 +27,7 @@ declare global {
         chat: Chat;
         reply_to_message?: Message;
         text?: string;
+        migrate_from_chat_id?: number;
     }
 
     interface Chat {

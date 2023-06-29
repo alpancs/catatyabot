@@ -12,7 +12,7 @@ export async function replyForItemsCreation(send: SendTextFn, edit: EditTextFn, 
 
 async function replyForItemCreation(send: SendTextFn, edit: EditTextFn, match: RegExpMatchArray, db: D1Database) {
     const { name, price, hashtags } = parseItemMatch(match);
-    let message = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
+    const message = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
     const { result } = await (await send(message)).json<{ result: Message }>();
 
     let statements = [

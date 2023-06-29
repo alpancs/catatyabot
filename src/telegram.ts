@@ -4,6 +4,7 @@ import { readItemsQuestion, replyForItemsReading } from "./read";
 import { replyForItemUpdate } from "./update";
 import { noItemToDelete, replyForItemDeletion } from "./delete";
 import { helpMessage } from "./help";
+import { migrateItems } from "./migration";
 
 let ignoredMessageCounts: { [key: number]: number } = {};
 
@@ -31,6 +32,8 @@ async function respondMessage(message: Message, env: Env) {
     const itemMatch = message.text?.match(itemPattern);
     if (message.reply_to_message && itemMatch)
         return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message, itemMatch, env.DB);
+
+    if (message.migrate_from_chat_id) return migrateItems(send, message.migrate_from_chat_id, env.DB);
 
     console.info({ status: "ignored", reason: "the message did not match any cases", message });
     ignoredMessageCounts[message.chat.id] = ((ignoredMessageCounts[message.chat.id] ?? 0) + 1) % 3;
