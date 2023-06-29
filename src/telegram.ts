@@ -9,7 +9,7 @@ let ignoredMessageCounts: { [key: number]: number } = {};
 
 export async function getUpdateResponse(update: Update, env: Env) {
     if (update.message) await respondMessage(update.message, env)
-    else console.info({ status: "ignored", reason: "the update does not contain a message", update });
+    else console.info({ status: "ignored", reason: "the update did not contain a message", update });
     return new Response();
 }
 
@@ -32,7 +32,7 @@ async function respondMessage(message: Message, env: Env) {
     if (message.reply_to_message && itemMatch)
         return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message, itemMatch, env.DB);
 
-    console.info({ status: "ignored", reason: "the message does not match any cases", message });
+    console.info({ status: "ignored", reason: "the message did not match any cases", message });
     ignoredMessageCounts[message.chat.id] = ((ignoredMessageCounts[message.chat.id] ?? 0) + 1) % 3;
     if (ignoredMessageCounts[message.chat.id] === 0)
         await send("kalau bingung bisa pencet /bantuan atau tanya langsung ke @alpancs 💁‍♂️");
