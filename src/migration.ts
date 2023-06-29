@@ -15,6 +15,5 @@ async function migrateItem(send: SendTextFn, item: Item, db: D1Database) {
 }
 
 async function getItems(chatId: number, db: D1Database) {
-    const { results } = await db.prepare("SELECT * FROM items WHERE chat_id = ?").bind(chatId).all<Item>();
-    return results ?? [];
+    return (await db.prepare("SELECT * FROM items WHERE chat_id = ?").bind(chatId).all<Item>()).results ?? [];
 }
