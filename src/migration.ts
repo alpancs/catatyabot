@@ -2,9 +2,11 @@ import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
 export async function migrateItems(send: SendTextFn, fromChatId: number, db: D1Database) {
-    const itemsPromise = getItems(fromChatId, db);
-    await send("Wah _group_ ini barusan banget di-_upgrade_ jadi _supergroup_ dan kode _group_-nya jadi berubah. Ijin catat ulang ya 🙏");
-    for (const item of await itemsPromise) await migrateItem(send, item, db);
+    const items = await getItems(fromChatId, db);
+    if (items.length) {
+        await send("Wah group ini barusan banget di-upgrade jadi supergroup dan kode groupnya jadi berubah. Ijin catat ulang ya 🙏");
+        for (const item of items) await migrateItem(send, item, db);
+    }
 }
 
 async function migrateItem(send: SendTextFn, item: Item, db: D1Database) {
