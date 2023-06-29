@@ -20,9 +20,8 @@ async function respondMessage(message: Message, env: Env) {
     if (message.text?.match(/^\s*\/?(start|bantuan)(@catatyabot)?\s*$/i)) return send(helpMessage);
     if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/i)) return ask(createItemsQuestion);
     if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/i)) return ask(readItemsQuestion);
-    if (message.text?.includes("hapus") && !message.reply_to_message) return send(noItemToDelete);
-    if (message.text?.includes("hapus") && message.reply_to_message)
-        return replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message, env.DB);
+    if (message.text?.match(/^\s*\/?hapus(@catatyabot)?\s*$/i)) return message.reply_to_message ?
+        replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message, env.DB) : send(noItemToDelete);
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(send, edit, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
