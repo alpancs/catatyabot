@@ -1,4 +1,4 @@
-import { getUpdateResponse } from "./telegram";
+import { getUpdateResponse } from "./telegram/index";
 
 export default {
 	async fetch(request: Request, env: Env) {
