@@ -55,3 +55,13 @@ function splitOnTelegramLimit(text: string) {
             return { head: text.substring(0, i), tail: text.substring(i + 1) };
     return { head: text.substring(0, limit), tail: text.substring(limit) };
 }
+
+export function responseToSendMessage(chatId: number, text: string, forceReply?: boolean): Response {
+    return Response.json({
+        method: "sendMessage",
+        chat_id: chatId,
+        text: escapeNonUserInput(text),
+        parse_mode: "MarkdownV2",
+        reply_markup: forceReply ? { force_reply: true } : undefined,
+    });
+}

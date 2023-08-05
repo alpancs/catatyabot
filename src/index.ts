@@ -1,17 +1,17 @@
-import { getUpdateResponse } from "./telegram/index";
+import { respondTelegramUpdate } from "./telegram/index";
 
 export default {
-	async fetch(request: Request, env: Env) {
+	async fetch(request: Request, env: Env): Promise<Response> {
 		if (request.method === "POST" && new URL(request.url).pathname === "/webhook/telegram")
 			return this.handleWebhookTelegram(request, env);
 		return new Response(undefined, { status: 404 });
 	},
 
-	async handleWebhookTelegram(request: Request, env: Env) {
+	async handleWebhookTelegram(request: Request, env: Env): Promise<Response> {
 		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.TELEGRAM_WEBHOOK_SECRET_TOKEN)
 			return new Response(undefined, { status: 401 });
 		try {
-			return getUpdateResponse(await request.json(), env);
+			return await respondTelegramUpdate(await request.json(), env) ?? new Response();
 		} catch (error: any) {
 			return new Response(error, { status: 422 })
 		}
