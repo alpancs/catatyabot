@@ -9,7 +9,7 @@ import { migrateItems } from "./migration";
 let ignoredMessageCounts: { [key: number]: number } = {};
 
 export async function getUpdateResponse(update: Update, env: Env) {
-    if (update.message) await respondMessage(update.message, env)
+    if (update.message) await respondMessage(update.message, env);
     else console.info({ status: "ignored", reason: "the update did not contain a message", update });
     return new Response();
 }
