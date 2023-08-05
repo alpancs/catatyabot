@@ -1,7 +1,7 @@
 import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
-export async function migrateItems(db: D1Database, fromChatId: number, actions: TelegramActions) {
+export async function migrateItems(db: D1Database, fromChatId: number, actions: TelegramActions): Promise<void> {
     const items = await getItems(db, fromChatId);
     if (items.length) {
         await actions.send("Wah group ini barusan banget di-upgrade jadi supergroup dan kode groupnya jadi berubah. Ijin catat ulang ya 🙏");

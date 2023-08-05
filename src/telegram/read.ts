@@ -5,9 +5,9 @@ const answerPattern = /^[\s-]*(?:(?<hashtagLeft>#\w+)\s+)?(?<answer>dari\s+awal|
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-export async function replyForItemsReading(db: D1Database, chatId: number, text: string, actions: TelegramActions) {
+export async function replyForItemsReading(db: D1Database, chatId: number, text: string, actions: TelegramActions): Promise<void> {
     const match = text.match(answerPattern);
-    if (!match) return actions.ask(readItemsQuestion);
+    if (!match) { await actions.ask(readItemsQuestion); return; }
 
     const { days, hashtag } = parseDaysMatch(match);
     const hashtagOnTitle = hashtag ? ` ${hashtag}` : "";
@@ -25,10 +25,10 @@ export async function replyForItemsReading(db: D1Database, chatId: number, text:
     if (hashtag !== undefined) values.push(hashtag);
 
     try {
-        return replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], actions);
+        await replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], actions);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
-        return actions.send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
+        await actions.send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
     }
 }
 

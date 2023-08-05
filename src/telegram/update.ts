@@ -2,7 +2,7 @@ import { parseItemMatch } from "./create";
 import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
-export async function replyForItemUpdate(db: D1Database, chatId: number, replyToMessage: Message, itemMatch: RegExpMatchArray, actions: TelegramActions) {
+export async function replyForItemUpdate(db: D1Database, chatId: number, replyToMessage: Message, itemMatch: RegExpMatchArray, actions: TelegramActions): Promise<void> {
     const { name, price, hashtags } = parseItemMatch(itemMatch);
     let statements = [
         db.prepare("UPDATE items SET name = ?3, price = ?4 WHERE chat_id = ?1 AND message_id = ?2 RETURNING *;")

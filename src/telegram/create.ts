@@ -4,7 +4,7 @@ import { escapeUserInput } from "./send";
 export const createItemsQuestion = "apa saja yang mau dicatat?";
 export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>-?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>-?\d+(?:[,.]\d*)*))(?<rawHashtags>(?:\s+#\w+)*)\s*$/i;
 
-export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions) {
+export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
     for (const match of text.split("\n").map(l => l.match(itemPattern))) {
         if (match) await replyForItemCreation(db, match, actions);
     }
