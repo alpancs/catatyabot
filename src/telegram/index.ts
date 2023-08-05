@@ -26,7 +26,7 @@ async function respondMessage(message: Message, env: Env): Promise<Response | vo
     if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/i)) return quickAsk(createItemsQuestion);
     if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/i)) return quickAsk(readItemsQuestion);
     if (message.text?.match(/^\s*\/?hapus(@catatyabot)?\s*$/i)) return message.reply_to_message ?
-        replyForItemDeletion(env.DB, message.chat.id, message.reply_to_message, actions) : quickAsk(noItemToDelete);
+        replyForItemDeletion(env.DB, message.chat.id, message.reply_to_message, actions) : quickSend(noItemToDelete);
 
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(env.DB, message.text, actions);
