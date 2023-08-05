@@ -24,17 +24,17 @@ async function respondMessage(message: Message, env: Env) {
     if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/i)) return ask(createItemsQuestion);
     if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/i)) return ask(readItemsQuestion);
     if (message.text?.match(/^\s*\/?hapus(@catatyabot)?\s*$/i)) return message.reply_to_message ?
-        replyForItemDeletion(actions, message.chat.id, message.reply_to_message, env.DB) : send(noItemToDelete);
+        replyForItemDeletion(env.DB, message.chat.id, message.reply_to_message, actions) : send(noItemToDelete);
 
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
-        return replyForItemsCreation(actions, message.text, env.DB);
+        return replyForItemsCreation(env.DB, message.text, actions);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
-        return replyForItemsReading(actions, message.chat.id, message.text, env.DB);
+        return replyForItemsReading(env.DB, message.chat.id, message.text, actions);
     const itemMatch = message.text?.match(itemPattern);
     if (message.reply_to_message && itemMatch)
-        return replyForItemUpdate(actions, message.chat.id, message.reply_to_message, itemMatch, env.DB);
+        return replyForItemUpdate(env.DB, message.chat.id, message.reply_to_message, itemMatch, actions);
 
-    if (message.migrate_from_chat_id) return migrateItems(actions, message.migrate_from_chat_id, env.DB);
+    if (message.migrate_from_chat_id) return migrateItems(env.DB, message.migrate_from_chat_id, actions);
 
     console.info({ status: "ignored", reason: "the message did not match any cases", message });
     ignoredMessageCounts[message.chat.id] = ((ignoredMessageCounts[message.chat.id] ?? 0) + 1) % 3;

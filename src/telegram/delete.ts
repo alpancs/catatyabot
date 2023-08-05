@@ -1,7 +1,7 @@
 export const noItemToDelete = `mau hapus pesan yang mana?
 _\\*cara hapus suatu catatan: balas pesan bot yang ada tanda ✅nya pakai perintah /hapus_`;
 
-export async function replyForItemDeletion(actions: TelegramActions, chatId: number, replyToMessage: Message, db: D1Database) {
+export async function replyForItemDeletion(db: D1Database, chatId: number, replyToMessage: Message, actions: TelegramActions) {
     try {
         const deletedItem = await db.prepare("DELETE FROM items WHERE chat_id = ?1 AND message_id = ?2 RETURNING *")
             .bind(chatId, replyToMessage.message_id).first<Item | null>();

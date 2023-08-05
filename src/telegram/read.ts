@@ -5,7 +5,7 @@ const answerPattern = /^[\s-]*(?:(?<hashtagLeft>#\w+)\s+)?(?<answer>dari\s+awal|
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-export async function replyForItemsReading(actions: TelegramActions, chatId: number, text: string, db: D1Database) {
+export async function replyForItemsReading(db: D1Database, chatId: number, text: string, actions: TelegramActions) {
     const match = text.match(answerPattern);
     if (!match) return actions.ask(readItemsQuestion);
 
@@ -25,15 +25,15 @@ export async function replyForItemsReading(actions: TelegramActions, chatId: num
     if (hashtag !== undefined) values.push(hashtag);
 
     try {
-        return replyWithItems(actions, title, (await db.prepare(query).bind(...values).all<Item>()).results);
+        return replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], actions);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause.message });
         return actions.send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
     }
 }
 
-async function replyWithItems(actions: TelegramActions, title: string, items?: Item[]) {
-    if (!items?.length) return actions.send(`${title}\n\n_masih kosong_`);
+async function replyWithItems(title: string, items: Item[], actions: TelegramActions) {
+    if (items.length === 0) return actions.send(`${title}\n\n_masih kosong_`);
     let text = title;
     let lastCreationDate = "0000-00-00";
     let count = 0;
