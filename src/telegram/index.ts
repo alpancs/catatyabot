@@ -15,25 +15,26 @@ export async function getUpdateResponse(update: Update, env: Env) {
 }
 
 async function respondMessage(message: Message, env: Env) {
-    const send = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text);
-    const ask = (text: string) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, true);
+    const send = (text: string, forceReply?: boolean) => sendMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, text, forceReply);
+    const ask = (text: string) => send(text, true);
     const edit = (messageId: number, text: string) => editMessage(env.TELEGRAM_BOT_TOKEN, message.chat.id, messageId, text);
+    const actions = { send, ask, edit };
 
     if (message.text?.match(/^\s*\/?(start|bantuan)(@catatyabot)?\s*$/i)) return send(helpMessage);
     if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/i)) return ask(createItemsQuestion);
     if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/i)) return ask(readItemsQuestion);
     if (message.text?.match(/^\s*\/?hapus(@catatyabot)?\s*$/i)) return message.reply_to_message ?
-        replyForItemDeletion(send, edit, message.chat.id, message.reply_to_message, env.DB) : send(noItemToDelete);
+        replyForItemDeletion(actions, message.chat.id, message.reply_to_message, env.DB) : send(noItemToDelete);
 
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
-        return replyForItemsCreation(send, edit, message.text, env.DB);
+        return replyForItemsCreation(actions, message.text, env.DB);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
-        return replyForItemsReading(send, ask, message.chat.id, message.text, env.DB);
+        return replyForItemsReading(actions, message.chat.id, message.text, env.DB);
     const itemMatch = message.text?.match(itemPattern);
     if (message.reply_to_message && itemMatch)
-        return replyForItemUpdate(send, edit, message.chat.id, message.reply_to_message, itemMatch, env.DB);
+        return replyForItemUpdate(actions, message.chat.id, message.reply_to_message, itemMatch, env.DB);
 
-    if (message.migrate_from_chat_id) return migrateItems(send, message.migrate_from_chat_id, env.DB);
+    if (message.migrate_from_chat_id) return migrateItems(actions, message.migrate_from_chat_id, env.DB);
 
     console.info({ status: "ignored", reason: "the message did not match any cases", message });
     ignoredMessageCounts[message.chat.id] = ((ignoredMessageCounts[message.chat.id] ?? 0) + 1) % 3;

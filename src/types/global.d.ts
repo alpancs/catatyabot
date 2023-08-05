@@ -9,6 +9,11 @@ declare global {
 
     type SendTextFn = (text: string) => Promise<Response>;
     type EditTextFn = (messageId: number, text: string) => Promise<Response>;
+    interface TelegramActions {
+        send: SendTextFn;
+        ask: SendTextFn;
+        edit: EditTextFn;
+    }
 
     interface Item {
         chat_id: number;
