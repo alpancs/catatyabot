@@ -18,7 +18,7 @@ export async function replyForItemUpdate(db: D1Database, chatId: number, replyTo
         let message = `~${replyToMessage.text}~\n*${escapeUserInput(name)}* *${thousandSeparated(price)}*`;
         if (updatedItems?.length) await actions.edit(replyToMessage.message_id, message);
     } catch (error: any) {
-        console.error({ message: error.message, cause: error.cause.message });
+        console.error({ message: error.message, cause: error.cause });
         await actions.send(`ada masalah pas lagi ubah catatan 😵`);
     }
 }
