@@ -18,30 +18,37 @@ export async function sendMessage(botToken: string, chatId: number, text: string
 
 async function sendCleanMessage(botToken: string, chatId: number, text: string, forceReply?: boolean): Promise<Response> {
     const { head, tail } = splitOnTelegramLimit(text);
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: chatId,
-            text: head,
-            parse_mode: "MarkdownV2",
-            reply_markup: forceReply ? { force_reply: true } : undefined,
-        }),
-    });
-    if (!response.ok) throw new Error(await response.text());
+    const response = await postToTelegram(botToken, "sendMessage", sendMessagePayload(chatId, head, forceReply));
     return tail ? sendCleanMessage(botToken, chatId, tail, forceReply) : response;
 }
 
+export function responseToSendMessage(chatId: number, text: string, forceReply?: boolean): Response {
+    return Response.json({ method: "sendMessage", ...sendMessagePayload(chatId, escapeNonUserInput(text), forceReply) });
+}
+
+function sendMessagePayload(chatId: number, text: string, forceReply?: boolean): any {
+    return {
+        chat_id: chatId,
+        text: text,
+        parse_mode: "MarkdownV2",
+        reply_markup: forceReply ? { force_reply: true } : undefined,
+    };
+}
+
 export async function editMessage(botToken: string, chatId: number, messageId: number, text: string): Promise<Response> {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/editMessageText`, {
+    return postToTelegram(botToken, "editMessageText", {
+        chat_id: chatId,
+        message_id: messageId,
+        text: escapeNonUserInput(text),
+        parse_mode: "MarkdownV2",
+    });
+}
+
+async function postToTelegram(token: string, methodName: string, body: any): Promise<Response> {
+    const response = await fetch(`https://api.telegram.org/bot${token}/${methodName}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: chatId,
-            message_id: messageId,
-            text: escapeNonUserInput(text),
-            parse_mode: "MarkdownV2",
-        }),
+        body: JSON.stringify(body),
     });
     if (!response.ok) throw new Error(await response.text());
     return response;
@@ -54,14 +61,4 @@ function splitOnTelegramLimit(text: string) {
         if (text[i] === "\n")
             return { head: text.substring(0, i), tail: text.substring(i + 1) };
     return { head: text.substring(0, limit), tail: text.substring(limit) };
-}
-
-export function responseToSendMessage(chatId: number, text: string, forceReply?: boolean): Response {
-    return Response.json({
-        method: "sendMessage",
-        chat_id: chatId,
-        text: escapeNonUserInput(text),
-        parse_mode: "MarkdownV2",
-        reply_markup: forceReply ? { force_reply: true } : undefined,
-    });
 }
