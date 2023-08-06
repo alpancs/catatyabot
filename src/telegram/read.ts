@@ -27,7 +27,7 @@ export async function replyForItemsReading(db: D1Database, chatId: number, text:
     try {
         await replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], actions);
     } catch (error: any) {
-        console.error({ message: error.message, cause: error.cause.message });
+        console.error({ message: error.message, cause: error.cause?.message });
         await actions.send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
     }
 }

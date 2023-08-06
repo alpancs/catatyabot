@@ -24,7 +24,7 @@ async function replyForItemCreation(db: D1Database, match: RegExpMatchArray, act
     try {
         await db.batch(statements);
     } catch (error: any) {
-        console.error({ message: error.message, cause: error.cause.message });
+        console.error({ message: error.message, cause: error.cause?.message });
         await actions.edit(result.message_id, `*${escapeUserInput(name)}* gagal dicatat 😵`);
     }
 }
