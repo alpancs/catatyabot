@@ -10,10 +10,13 @@ export default {
 	async handleWebhookTelegram(request: Request, env: Env): Promise<Response> {
 		if (request.headers.get("X-Telegram-Bot-Api-Secret-Token") !== env.TELEGRAM_WEBHOOK_SECRET_TOKEN)
 			return new Response(undefined, { status: 401 });
+
+		let update: Update;
 		try {
-			return await respondTelegramUpdate(await request.json(), env) ?? new Response();
+			update = await request.json();
 		} catch (error: any) {
 			return new Response(error, { status: 422 })
 		}
+		return await respondTelegramUpdate(update, env) ?? new Response();
 	},
 };
