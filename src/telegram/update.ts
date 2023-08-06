@@ -15,7 +15,7 @@ export async function replyForItemUpdate(db: D1Database, chatId: number, replyTo
 
     try {
         const updatedItems = (await db.batch(statements))[0].results;
-        let message = `~${replyToMessage.text}~\n*${escapeUserInput(name)}* *${thousandSeparated(price)}*`;
+        let message = `~${escapeUserInput(replyToMessage.text!)}~\n*${escapeUserInput(name)}* *${thousandSeparated(price)}*`;
         if (updatedItems?.length) await actions.edit(replyToMessage.message_id, message);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause });
