@@ -5,12 +5,13 @@ export const createItemsQuestion = "apa saja yang mau dicatat?";
 export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>-?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>-?\d+(?:[,.]\d*)*))(?<rawHashtags>(?:\s+#\w+)*)\s*$/i;
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
-    for (const match of text.split("\n").map(l => l.match(itemPattern))) {
-        if (match) await replyForItemCreation(db, match, actions);
-    }
+    const prices = (await Promise.all(text.split("\n").map(l => replyForItemCreation(db, l.match(itemPattern), actions)))).filter(p => p);
+    if (prices.length > 1) await actions.send(`Totalnya barusan: *${thousandSeparated(prices.reduce((p, c) => p + c))}*`);
 }
 
-async function replyForItemCreation(db: D1Database, match: RegExpMatchArray, actions: TelegramActions) {
+async function replyForItemCreation(db: D1Database, match: RegExpMatchArray | null, actions: TelegramActions): Promise<number> {
+    if (!match) return 0;
+
     const { name, price, hashtags } = parseItemMatch(match);
     const message = `*${escapeUserInput(name)}* *${thousandSeparated(price)}* dicatat ✅`;
     const { result } = await (await actions.send(message)).json<{ result: Message }>();
@@ -23,9 +24,11 @@ async function replyForItemCreation(db: D1Database, match: RegExpMatchArray, act
     for (const hashtag of hashtags) statements.push(insertHashtagStmt.bind(result.chat.id, result.message_id, hashtag));
     try {
         await db.batch(statements);
+        return price;
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause?.message });
         await actions.edit(result.message_id, `*${escapeUserInput(name)}* gagal dicatat 😵`);
+        return 0;
     }
 }
 
