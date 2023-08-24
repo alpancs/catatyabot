@@ -44,6 +44,14 @@ export async function editMessage(botToken: string, chatId: number, messageId: n
     });
 }
 
+export async function deleteMessage(botToken: string, chatId: number, messageId: number): Promise<void> {
+    try {
+        await postToTelegram(botToken, "deleteMessage", { chat_id: chatId, message_id: messageId });
+    } catch (error: any) {
+        if (error.message?.description !== "Bad Request: message to delete not found") throw error;
+    }
+}
+
 async function postToTelegram(token: string, methodName: string, body: any): Promise<Response> {
     const response = await fetch(`https://api.telegram.org/bot${token}/${methodName}`, {
         method: "POST",
@@ -51,13 +59,13 @@ async function postToTelegram(token: string, methodName: string, body: any): Pro
         body: JSON.stringify(body),
     });
     if (!response.ok) {
-        const responseJSON = await response.json<{ description?: string }>();
-        const retryDelaySeconds = parseInt(responseJSON.description?.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
+        const error = await response.json<{ description?: string }>();
+        const retryDelaySeconds = parseInt(error.description?.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
         if (retryDelaySeconds) return new Promise(resolve => setTimeout(
             () => resolve(postToTelegram(token, methodName, body)),
             retryDelaySeconds * 1000,
         ));
-        throw new Error(JSON.stringify(responseJSON));
+        throw { message: error };
     }
     return response;
 }

@@ -9,10 +9,12 @@ declare global {
 
     type SendTextFn = (text: string) => Promise<Response>;
     type EditTextFn = (messageId: number, text: string) => Promise<Response>;
+    type DeleteTextFn = (messageId: number) => Promise<void>;
     interface TelegramActions {
         send: SendTextFn;
         ask: SendTextFn;
         edit: EditTextFn;
+        delete: DeleteTextFn;
     }
 
     interface Item {
@@ -29,6 +31,7 @@ declare global {
 
     interface Message {
         message_id: number;
+        from?: { username?: string };
         chat: Chat;
         reply_to_message?: Message;
         text?: string;
