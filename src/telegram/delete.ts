@@ -32,5 +32,4 @@ export async function deleteMessages(db: D1Database, chatId: number, messageText
         await actions.delete(item.message_id);
         await db.prepare("DELETE FROM items WHERE chat_id = ?1 AND message_id = ?2").bind(chatId, item.message_id).run();
     }));
-    if (toDeleteItems.length < items.length) return Promise.reject("The request needs to be repeated due to subrequest limit.");
 }
