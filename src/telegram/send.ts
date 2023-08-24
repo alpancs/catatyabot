@@ -50,7 +50,13 @@ async function postToTelegram(token: string, methodName: string, body: any): Pro
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
-    if (!response.ok) throw new Error(await response.text());
+    if (!response.ok) {
+        const responseJSON = await response.json<{ description: string }>();
+        const description = responseJSON.description;
+        const retryDelaySeconds = parseInt(description.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
+        if (retryDelaySeconds) return new Promise(resolve => setTimeout(() => resolve(postToTelegram(token, methodName, body)), retryDelaySeconds));
+        else throw new Error(JSON.stringify(responseJSON));
+    }
     return response;
 }
 
