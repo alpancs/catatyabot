@@ -6,10 +6,10 @@ export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>[+-]?\d+
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
     let prices = [];
-    let subreqCount = 0;
+    let itemCreationCount = 0;
     for (const match of text.split("\n").map(s => s.match(itemPattern)).filter(m => m)) {
         prices.push(await replyForItemCreation(db, match!, actions));
-        if (++subreqCount >= 48) {
+        if (++itemCreationCount >= 25) {
             await actions.send("Ijin sampai sini aja nyatatnya, soalnya kebanyakan 😖");
             break;
         }
