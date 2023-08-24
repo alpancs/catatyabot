@@ -6,13 +6,15 @@ export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>[+-]?\d+
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
     let prices = [];
-    for (const s of text.split("\n")) {
-        const match = s.match(itemPattern);
-        if (match) {
-            const price = await replyForItemCreation(db, match, actions);
-            if (price) prices.push(price);
+    let subreqCount = 0;
+    for (const match of text.split("\n").map(s => s.match(itemPattern)).filter(m => m)) {
+        prices.push(await replyForItemCreation(db, match!, actions));
+        if (++subreqCount >= 48) {
+            await actions.send("Ijin sampai sini aja nyatatnya, soalnya kebanyakan 😖");
+            break;
         }
     }
+    prices = prices.filter(p => p);
     if (prices.length > 1) await actions.send(`Totalnya barusan: *${thousandSeparated(prices.reduce((p, c) => p + c))}*`);
 }
 
