@@ -54,7 +54,7 @@ async function postToTelegram(token: string, methodName: string, body: any): Pro
         const responseJSON = await response.json<{ description: string }>();
         const description = responseJSON.description;
         const retryDelaySeconds = parseInt(description.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
-        if (retryDelaySeconds) return new Promise(resolve => setTimeout(() => resolve(postToTelegram(token, methodName, body)), retryDelaySeconds));
+        if (retryDelaySeconds) return new Promise(resolve => setTimeout(() => resolve(postToTelegram(token, methodName, body)), retryDelaySeconds * 1000));
         else throw new Error(JSON.stringify(responseJSON));
     }
     return response;
