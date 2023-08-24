@@ -1,3 +1,5 @@
+import asyncPool from "tiny-async-pool";
+
 import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
@@ -5,17 +7,17 @@ export const createItemsQuestion = "apa saja yang mau dicatat?";
 export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>[+-]?\d+[,.]?\d*)\s*(?<unit>ribu|rb|k|juta|jt))|(?<priceInt>[+-]?\d+(?:[,.]\d*)*))(?<rawHashtags>(?:\s+#\w+)*)\s*$/i;
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
+    const matches = text.split("\n").map(s => s.match(itemPattern)).filter(m => m);
+    const itemsToProcessLimit = 30;
+    const priceIterator = asyncPool(3, matches.slice(0, itemsToProcessLimit), (m: RegExpMatchArray | null) => replyForItemCreation(db, m!, actions));
     let prices = [];
-    let itemCreationCount = 0;
-    for (const match of text.split("\n").map(s => s.match(itemPattern)).filter(m => m)) {
-        prices.push(await replyForItemCreation(db, match!, actions));
-        if (++itemCreationCount >= 25) {
-            await actions.send("Ijin sampai sini aja nyatatnya, soalnya kebanyakan 😖");
-            break;
-        }
-    }
-    prices = prices.filter(p => p);
+    for await (const price of priceIterator) if (price) prices.push(price);
     if (prices.length > 1) await actions.send(`Totalnya barusan: *${thousandSeparated(prices.reduce((p, c) => p + c))}*`);
+
+    if (matches.length > itemsToProcessLimit) {
+        await actions.send("Ijin sampai sini aja nyatatnya, soalnya kebanyakan 😖\n\nBisa dicoba lagi nih yang belum dicatat:");
+        await actions.send(escapeUserInput(matches.slice(itemsToProcessLimit).map(m => m?.[0]).join("\n")));
+    }
 }
 
 async function replyForItemCreation(db: D1Database, match: RegExpMatchArray, actions: TelegramActions): Promise<number> {

@@ -7,8 +7,12 @@
     "deploy": "wrangler deploy"
   },
   "devDependencies": {
-    "wrangler": "^3.5.1",
+    "@cloudflare/workers-types": "^4.20230821.0",
+    "@types/tiny-async-pool": "^2.0.0",
     "typescript": "^5.1.6",
-    "@cloudflare/workers-types": "^4.20230821.0"
+    "wrangler": "^3.5.1"
+  },
+  "dependencies": {
+    "tiny-async-pool": "^2.1.0"
   }
 }

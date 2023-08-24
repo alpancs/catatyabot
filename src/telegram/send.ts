@@ -51,11 +51,13 @@ async function postToTelegram(token: string, methodName: string, body: any): Pro
         body: JSON.stringify(body),
     });
     if (!response.ok) {
-        const responseJSON = await response.json<{ description: string }>();
-        const description = responseJSON.description;
-        const retryDelaySeconds = parseInt(description.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
-        if (retryDelaySeconds) return new Promise(resolve => setTimeout(() => resolve(postToTelegram(token, methodName, body)), retryDelaySeconds * 1000));
-        else throw new Error(JSON.stringify(responseJSON));
+        const responseJSON = await response.json<{ description?: string }>();
+        const retryDelaySeconds = parseInt(responseJSON.description?.match(/Too Many Requests: retry after (\d+)/i)?.[1] ?? "");
+        if (retryDelaySeconds) return new Promise(resolve => setTimeout(
+            () => resolve(postToTelegram(token, methodName, body)),
+            retryDelaySeconds * 1000,
+        ));
+        throw new Error(JSON.stringify(responseJSON));
     }
     return response;
 }
