@@ -77,7 +77,7 @@ function parseDaysMatch(match: RegExpMatchArray) {
 
 export function thousandSeparated(n: number): string {
     if (n < 0) return `-${thousandSeparated(-n)}`;
-    if (n < 1000) return n.toString();
+    if (n < 1000) return Math.round(n).toString();
     return `${thousandSeparated(Math.floor(n / 1000))}.`
-        + (n % 1000).toString().padStart(3, "0");
+        + (Math.round(n) % 1000).toString().padStart(3, "0");
 }
