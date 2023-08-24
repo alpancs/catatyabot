@@ -8,7 +8,7 @@ export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>[+-]?\d+
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
     const matches = text.split("\n").map(s => s.match(itemPattern)).filter(m => m);
-    const itemsToProcessLimit = 20;
+    const itemsToProcessLimit = 17;
     const priceIterator = asyncPool(2, matches.slice(0, itemsToProcessLimit), (m: RegExpMatchArray | null) => replyForItemCreation(db, m!, actions));
     let prices = [];
     for await (const price of priceIterator) if (price) prices.push(price);
