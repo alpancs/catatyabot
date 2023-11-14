@@ -1,11 +1,12 @@
 import { escapeUserInput } from "./send";
 
 export const readItemsQuestion = "mau lihat catatan dari berapa hari yang lalu?";
+export const peekItemsQuestion = "mau intip catatan dari berapa hari yang lalu?";
 const answerPattern = /^[\s-]*(?:(?<hashtagLeft>#\w+)\s+)?(?<answer>dari\s+awal|semua|semuanya|(?<coef>\d+\.?\d*)\s*(?<unit>hari|hr|pekan|minggu|bulan|bln|tahun|th|thn)?(?:\s+(?:yang\s+lalu|yg\s+lalu|terakhir))?)[\s.]*(?:\s+(?<hashtagRight>#\w+))?\s*$/i;
 const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-export async function replyForItemsReading(db: D1Database, chatId: number, text: string, actions: TelegramActions): Promise<void> {
+export async function replyForItemsReading(db: D1Database, chatId: number, text: string, showItems: boolean, actions: TelegramActions): Promise<void> {
     const match = text.match(answerPattern);
     if (!match) { await actions.ask(readItemsQuestion); return; }
 
@@ -25,14 +26,14 @@ export async function replyForItemsReading(db: D1Database, chatId: number, text:
     if (hashtag !== undefined) values.push(hashtag);
 
     try {
-        await replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], actions);
+        await replyWithItems(title, (await db.prepare(query).bind(...values).all<Item>()).results ?? [], showItems, actions);
     } catch (error: any) {
         console.error({ message: error.message, cause: error.cause?.message });
         await actions.send("maaf lagi ada masalah nih, gak bisa lihat daftar catatan 😵");
     }
 }
 
-async function replyWithItems(title: string, items: Item[], actions: TelegramActions) {
+async function replyWithItems(title: string, items: Item[], showItems: boolean, actions: TelegramActions) {
     if (items.length === 0) return actions.send(`${title}\n\n_masih kosong_`);
     let text = title;
     let lastCreationDate = "0000-00-00";
@@ -47,7 +48,7 @@ async function replyWithItems(title: string, items: Item[], actions: TelegramAct
             count = 0;
             total = 0;
         }
-        text += `\n_${created_at.substring(11, 16)}_ ${escapeUserInput(name)} ${thousandSeparated(price)}`;
+        if (showItems) text += `\n_${created_at.substring(11, 16)}_ ${escapeUserInput(name)} ${thousandSeparated(price)}`;
         count += 1;
         total += price;
         grandTotal += price;

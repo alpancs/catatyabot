@@ -1,6 +1,6 @@
 import { sendMessage, editMessage, deleteMessage, responseToSendMessage } from "./send";
 import { createItemsQuestion, replyForItemsCreation, itemPattern } from "./create";
-import { readItemsQuestion, replyForItemsReading } from "./read";
+import { readItemsQuestion, peekItemsQuestion, replyForItemsReading } from "./read";
 import { replyForItemUpdate } from "./update";
 import { noItemToDelete, replyForItemDeletion, deleteMessages } from "./delete";
 import { helpMessage } from "./help";
@@ -26,6 +26,7 @@ async function respondMessage(message: Message, env: Env): Promise<Response | vo
     if (message.text?.match(/^\s*\/?(start|bantuan)(@catatyabot)?\s*$/i)) return quickSend(helpMessage);
     if (message.text?.match(/^\s*\/?catat(@catatyabot)?\s*$/i)) return quickAsk(createItemsQuestion);
     if (message.text?.match(/^\s*\/?lihat(@catatyabot)?\s*$/i)) return quickAsk(readItemsQuestion);
+    if (message.text?.match(/^\s*\/?intip(@catatyabot)?\s*$/i)) return quickAsk(peekItemsQuestion);
     if (message.text?.match(/^\s*\/?hapus(@catatyabot)?\s*$/i)) return message.reply_to_message ?
         replyForItemDeletion(env.DB, message.chat.id, message.reply_to_message, actions) : quickSend(noItemToDelete);
     if (message.text?.match(/^\s*\/?delete(@catatyabot)?\s*/i) && message.from?.username === "alpancs")
@@ -34,7 +35,9 @@ async function respondMessage(message: Message, env: Env): Promise<Response | vo
     if (message.reply_to_message?.text === createItemsQuestion && message.text)
         return replyForItemsCreation(env.DB, message.text, actions);
     if (message.reply_to_message?.text === readItemsQuestion && message.text)
-        return replyForItemsReading(env.DB, message.chat.id, message.text, actions);
+        return replyForItemsReading(env.DB, message.chat.id, message.text, true, actions);
+    if (message.reply_to_message?.text === peekItemsQuestion && message.text)
+        return replyForItemsReading(env.DB, message.chat.id, message.text, false, actions);
     const itemMatch = message.text?.match(itemPattern);
     if (message.reply_to_message && itemMatch)
         return replyForItemUpdate(env.DB, message.chat.id, message.reply_to_message, itemMatch, actions);
