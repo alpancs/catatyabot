@@ -1,5 +1,3 @@
-import asyncPool from "tiny-async-pool";
-
 import { thousandSeparated } from "./read";
 import { escapeUserInput } from "./send";
 
@@ -8,10 +6,12 @@ export const itemPattern = /^(?<name>.+)\s+(?:(?<withUnit>(?<priceFloat>[+-]?\d+
 
 export async function replyForItemsCreation(db: D1Database, text: string, actions: TelegramActions): Promise<void> {
     const matches = text.split("\n").map(s => s.match(itemPattern)).filter(m => m);
-    const itemsToProcessLimit = 17;
-    const priceIterator = asyncPool(2, matches.slice(0, itemsToProcessLimit), (m: RegExpMatchArray | null) => replyForItemCreation(db, m!, actions));
+    const itemsToProcessLimit = 12;
     let prices = [];
-    for await (const price of priceIterator) if (price) prices.push(price);
+    for (const m of matches.slice(0, itemsToProcessLimit)) {
+        let price = await replyForItemCreation(db, m!, actions);
+        if (price) prices.push(price);
+    }
     if (prices.length > 1) await actions.send(`Totalnya barusan: *${thousandSeparated(prices.reduce((p, c) => p + c))}*`);
 
     if (matches.length > itemsToProcessLimit) {

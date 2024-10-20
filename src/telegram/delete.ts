@@ -1,5 +1,3 @@
-import asyncPool from "tiny-async-pool";
-
 import { escapeUserInput } from "./send";
 
 export const noItemToDelete = `mau hapus pesan yang mana?
@@ -28,9 +26,9 @@ export async function deleteMessages(db: D1Database, chatId: number, messageText
     }
     const itemToDeleteLimit = 49;
     const toDeleteItems = items.slice(0, itemToDeleteLimit);
-    for await (const v of asyncPool(2, toDeleteItems, async (item: Item) => {
+    for (const item of toDeleteItems) {
         await actions.delete(item.message_id);
         await db.prepare("DELETE FROM items WHERE chat_id = ?1 AND message_id = ?2").bind(chatId, item.message_id).run();
-    }));
+    }
     await actions.send(`terhapus: ${toDeleteItems.length}`);
 }
