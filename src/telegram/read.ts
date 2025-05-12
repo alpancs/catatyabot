@@ -42,7 +42,7 @@ async function replyWithItems(title: string, items: Item[], showItems: boolean, 
     let grandTotal = 0;
     for (const { name, price, created_at } of items) {
         if (!created_at.startsWith(lastCreationDate)) {
-            if (count > 1) text += `\n_total: ${thousandSeparated(total)}_`;
+            if (count > 1 || !showItems) text += `\n_total: ${thousandSeparated(total)}_`;
             lastCreationDate = created_at.substring(0, 10);
             text += `\n\n*__${idDateFormat(lastCreationDate)}__*`;
             count = 0;
