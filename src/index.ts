@@ -15,7 +15,11 @@ export default {
 		try {
 			update = await request.json();
 		} catch (error: any) {
-			return new Response(error, { status: 422 })
+			console.error("Failed to parse Telegram webhook payload", error?.stack ?? error);
+			return new Response("Invalid JSON payload", {
+				status: 422,
+				headers: { "Content-Type": "text/plain; charset=UTF-8" },
+			});
 		}
 		return await respondTelegramUpdate(update, env) ?? new Response();
 	},
